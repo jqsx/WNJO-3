@@ -30,10 +30,11 @@ export default class ClientSocket extends WebSocket {
             }
             else {
                 console.error(`Type ${message.TYPE} isn't supported locally.`);
+                console.error(`MSG: ${JSON.stringify(message)}`);
             }
         }
         else {
-            console.error("TYPE is undefined");
+            console.error(`TYPE is undefined ${JSON.stringify(message)}`);
         }
     }
 

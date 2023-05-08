@@ -1,8 +1,8 @@
 export default class DataMessage {
-    type="";
+    TYPE="";
     data={};
     constructor(type, data) {
-        this.type = type;
+        this.TYPE = type;
         this.data = data;
     }
 }

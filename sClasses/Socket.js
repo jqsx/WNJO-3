@@ -4,6 +4,7 @@ import PlayerHandler from "./PlayerHandler.js";
 import Player from "../classes/Player.js";
 import os from 'os';
 import DataMessage from "./DataMessage.js";
+import AccountHandler from "./AccountHandler.js";
 
 export default class ServerSocket extends WebSocketServer {
     Clients = new Map(); // any type of connection 
@@ -11,9 +12,15 @@ export default class ServerSocket extends WebSocketServer {
     events = new Map();
 
     playerHandler;
+    accountHandler;
     constructor() {
         super({ port: config.WSPORT });
         this.playerHandler = new PlayerHandler(this);
+        this.accountHandler = new AccountHandler(this);
+        process.on('exit', () => this.accountHandler.saveAccounts());
+        process.on('SIGINT', () => {
+            process.exit();
+        });
         this.on('connection', (ws, req) => {
             console.log('new incoming connection...');
             this.Clients.set(ws, {account: null });
@@ -22,6 +29,9 @@ export default class ServerSocket extends WebSocketServer {
                     const json = JSON.parse(data);
                     if (json.TYPE === 'PUP') { // Player Update Procedure
                         this.playerHandler.processRequest(json.data, ws);
+                    }
+                    else if (json.TYPE === 'ARP') {
+                        this.accountHandler.processRequest(json.data, ws);
                     }
                 }
                 catch (e) {
@@ -90,5 +100,17 @@ export default class ServerSocket extends WebSocketServer {
         let total = totalRAM / (1024 * 1024);
         let used = freeRAM / (1024 * 1024);
         console.log("RAM USAGE: " + used + " / " + total + " MB");
+    }
+
+    sendErr(ws, message) {
+        this.sendMessage(ws, [new DataMessage("ERR", { message: message, code: 400 })]);
+    }
+
+    sendLog(ws, message) {
+        this.sendMessage(ws, [new DataMessage("ERR", { message: message, code: 200 })]);
+    }
+
+    sendWarn(ws, message) {
+        this.sendMessage(ws, [new DataMessage("ERR", { message: message, code: 300 })]);
     }
 }

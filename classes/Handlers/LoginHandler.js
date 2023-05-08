@@ -11,6 +11,7 @@ export default class LoginHandler extends Handler {
         if (!(ws instanceof ClientSocket)) return false;
         const player = App.instance.Players.get(data.id);
         App.instance.localPlayer = player;
+        console.log("Found and asigned local player.");
     }
 
     /*

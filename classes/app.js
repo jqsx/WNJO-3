@@ -1,4 +1,5 @@
 import ClientSocket from "./ClientSocket.js";
+import ErrorLogHandler from "./Handlers/ErrorLogHandler.js";
 import LoginHandler from "./Handlers/LoginHandler.js";
 import PingHandler from "./Handlers/PingHandler.js";
 import PlayerHandler from "./Handlers/PlayerHandler.js";
@@ -34,6 +35,7 @@ export default class App {
         this.#initializeUserInput();
 
         setInterval(() => {
+            document.getElementById('debug').innerText = "";
             this.#time = Date.now();
             this.playerInput();
             this.frameRender();
@@ -43,6 +45,7 @@ export default class App {
     #initializeSocket() {
         this.Players = new Map();
         this.#localPlayers = new Map();
+        this.localPlayer = undefined;
         this.#clientSocket = new ClientSocket();
         this.#clientSocket.onerror = () => {
             this.#clientSocket.close();
@@ -57,17 +60,13 @@ export default class App {
         this.#clientSocket.setHandler(PingHandler.getType(), new PingHandler());
         this.#clientSocket.setHandler(PlayerHandler.getType(), new PlayerHandler());
         this.#clientSocket.setHandler(LoginHandler.getType(), new LoginHandler());
+        this.#clientSocket.setHandler(ErrorLogHandler.getType(), new ErrorLogHandler());
     }
 
     #initializeUserInput() {
         window.addEventListener("keydown", (ev) => {
             if (!this.#keysDown.includes(ev.key)) 
                 this.#keysDown.push(ev.key);
-            
-
-
-            console.log(ev.key);
-            console.log(this.#keysDown);
         });
         window.addEventListener("keyup", (ev) => {
             for (let i = this.#keysDown.length - 1; i >= 0; i--) {
@@ -110,6 +109,29 @@ export default class App {
         this.#ctx.fillText("Avaiable only 16ms for entire render, if we want to render at 60fps", 0, 40, this.renderer.width);
     }
 
+    log(message, code) {
+        const log = document.getElementById('log');
+        let sysmsg = document.createElement('sysmsg');
+        sysmsg.innerText = `[${code}]\n${message}`;
+        switch (code) {
+            case 200:
+                sysmsg.style.backgroundColor = '#57bb78';
+                break;
+            case 400:
+                sysmsg.style.backgroundColor = '#ff0000';
+                break;
+            case 300:
+                break;
+            default:
+                sysmsg.innerText += " (UNKNOWN CODE)";
+                break;
+        }
+        log.appendChild(sysmsg);
+        setTimeout(() => {
+            sysmsg.remove();
+        }, 5000);
+    }
+
     #drawPlayer(player) {
         const size = 15;
         const screenPosition = this.#worldToScreen(player.position);
@@ -118,10 +140,6 @@ export default class App {
     }
 
     playerInput() {
-        if (this.isKeyDown("w")) {
-            console.log("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA");
-        }
-
         let x = this.#toInt(this.isKeyDown("d")) + this.#toInt(this.isKeyDown("a")) * -1;
         let y = this.#toInt(this.isKeyDown("w")) + this.#toInt(this.isKeyDown("s")) * -1;
         this.cameraPosition.x -= x;
@@ -130,7 +148,9 @@ export default class App {
         if (this.localPlayer !== undefined) {
             this.localPlayer.position.x = this.cameraPosition.x;
             this.localPlayer.position.y = this.cameraPosition.y;
+            document.getElementById('debug').innerText += "\nLocal Player Position: " + this.localPlayer.position;
         }
+        document.getElementById('debug').innerText += "\nCamera Position: " + this.cameraPosition.toString();
 
         this.#clientSocket.sendMessage("PUP", {position: this.cameraPosition});
     }
@@ -149,5 +169,21 @@ export default class App {
 
     #clamp(n, min, max) {
         return Math.min(Math.max(n, min), max);
+    }
+
+    AccountRetrieval(type) {
+        let name = document.getElementById("NI").value;
+        let pass = document.getElementById("PI").value;
+        switch (type) {
+            case "create":
+                this.#clientSocket.sendMessage("ARP", { a: "CA", n: name, p: pass });
+                break;
+            case "login":
+                this.#clientSocket.sendMessage("ARP", { a: "LI", n: name, p: pass });
+                break;
+            default:
+                this.log("Something went wrong when logging in...", 400);
+                break;
+        }
     }
 }

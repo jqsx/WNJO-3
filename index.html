@@ -1,14 +1,32 @@
 <!DOCTYPE html>
 <html>
     <head>
+        <meta charset="utf-8" />
         <link rel="stylesheet" href="./client/css/style.css">
         <script type="module" src="./client/script.js"></script>
         <title>WNJO</title>
     </head>
     <body>
-        <app>
+        <container>
+            <flexcontainer>
+                <label>Name: </label>
+                <input id="NI" class="accountInput" type="text">
+            </flexcontainer>
+            <flexcontainer>
+                <label>Password: </label>
+                <input id="PI" class="accountInput" type="password">
+            </flexcontainer>
+            <flexcontainer>
+                <button id="LIB">Login</button>
+                <button id="CB">Create</button>
+            </flexcontainer>
+        </container>
+        <container>
             <h1>Loading Data</h1>
             <p id="ld">Loading world data...</p>
-        </app>
+        </container>
+        <container id="log" class="nobg">
+            <sysmsg id="debug" style="animation: none;"></sysmsg>
+        </container>
     </body>
 </html>

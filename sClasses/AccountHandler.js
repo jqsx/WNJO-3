@@ -12,7 +12,7 @@ export default class AccountHandler {
     constructor(socket) {
         if (socket instanceof ServerSocket) {
             this.#ServerSocket = socket;
-            fs.readFile(path.resolve('../AccountData/accounts.json'), (err, data) => {
+            fs.readFile(path.resolve('./AccountData/accounts.json'), (err, data) => {
                 if (err) 
                     throw err;
                 
@@ -32,14 +32,23 @@ export default class AccountHandler {
     }
 
     processRequest(message, ws) {
-        if (message === undefined) 
+        if (message === undefined) {
+            this.#ServerSocket.sendErr(ws, "No Data");
             return;
+        }
         
         if (!(ws instanceof WebSocket)) 
             return;
          else if (this.#ServerSocket.Clients.get(ws).account === null) {
-            if (!("n" in message && "p" in message)) 
-                return; // send error message
+            if (!("n" in message && "p" in message)) {
+                this.#ServerSocket.sendErr(ws, "Invalid parameters");
+                return;
+            } 
+            else if (message.n.length <= 3 || message.p.length <= 6 && message.n.length > 16 && message.p.length > 32) {
+                this.#ServerSocket.sendErr(ws, "Either the name, or the password exceeds the length bounds.\n\n The name can only be between 4 to 16 letters long and the password 7 to 32.");
+                return;
+            }
+            // send error message
              // TODO: make a client side request error display
             if ("a" in message) {
                 let acc = this.LoadedAccounts.get(message.n);
@@ -55,15 +64,23 @@ export default class AccountHandler {
                             this.LoadedAccounts.set(message.n, nAcc);
                             this.#initializeNewPlayer(ws, nAcc);
                         }
+                        else {
+                            this.#ServerSocket.sendErr(ws, "An account with this name already exists.");
+                        }
                         break;
                     case "LI":
                         // Log In
                         if (acc === undefined) {
                             // no account found under name...
                             // send error message to client
+                            this.#ServerSocket.sendErr(ws, "The account you're trying to log in with doesn't exist.");
                         }
                         else if (message.p === acc.pass) {
                             this.#initializeNewPlayer(ws, acc);
+                            this.#ServerSocket.sendLog(ws, `Signed in with account ${acc.name}`);
+                        }
+                        else {
+                            this.#ServerSocket.sendErr(ws, "The account you're trying to log in with doesn't exist.");
                         }
                         break;
                     case "QL":
@@ -72,6 +89,7 @@ export default class AccountHandler {
                     default:
                         // Err
                         console.error("Unrecognized procedure");
+                        this.#ServerSocket.sendErr(ws, "Unrecognized procedure");
                         break;
                 }
             }
@@ -79,15 +97,23 @@ export default class AccountHandler {
     }
 
     #initializeNewPlayer(ws, account) {
-        let player = new Player({name: account.name});
-        this.Players.set(account._ID, player);
+        this.#ServerSocket.Clients.set(ws, {account: account._ID });
+        let player = this.#ServerSocket.Players.get(account._ID);
+        if (player === undefined) {
+            player = new Player({name: account.name});
+            this.#ServerSocket.Players.set(account._ID, player);
+        }
         let playerUpdate = this.#ServerSocket.getPlayersUpdateDataMessage();
         let loginUpdate = new DataMessage("LI", {id: player.id});
         this.#ServerSocket.sendMessage(ws, [playerUpdate, loginUpdate]);
     }
 
     saveAccounts() {
+        console.log("Saving");
         const data = JSON.stringify(this.LoadedAccounts);
-        fs.writeFile(path.resolve('../AccountData/accounts.json'), data);
+        fs.writeFile('./AccountData/accounts.json', data, (err) => {
+            if (err) return console.error(err);
+            console.log("File has been saved");
+        });
     }
 }

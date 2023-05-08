@@ -15,11 +15,12 @@ export default class PlayerHandler {
     }
 
     processRequest(message, ws) {
+        let acc = this.#ServerSocket.Clients.get(ws);
         if (message === undefined) return;
         if (!(ws instanceof WebSocket)) return;
 
-        else if (this.#ServerSocket.Players.has(ws)) {
-            this.#updatePlayer(this.#ServerSocket.Players.get(ws), message);
+        else if (this.#ServerSocket.Players.has(acc.account)) {
+            this.#updatePlayer(this.#ServerSocket.Players.get(acc.account), message);
         }
     }
 

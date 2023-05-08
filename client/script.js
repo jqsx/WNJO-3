@@ -8,11 +8,13 @@ const setup = () => {
 
     dataDisplay.innerText = 'Loading...';
 
+    document.getElementById('LIB').addEventListener('click', () => app.AccountRetrieval("login"));
+    document.getElementById('CB').addEventListener('click', () => app.AccountRetrieval("create"));
+
     // load anything before that
     // such as map or stuff
-
     
-
+    dataDisplay.parentElement.style.display = 'none';
     app.start();
 }
 

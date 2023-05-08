@@ -17,8 +17,8 @@ body {
     background-attachment: fixed;
 }
 
-app {
-    opacity: 0;
+container {
+    opacity: 1;
     position: absolute;
     width: 100vw;
     height: 100vh;
@@ -31,11 +31,82 @@ app {
     background: linear-gradient(0deg, #444 0%, #222 2% 98%, #444 100%) repeat-y;
     background-size: 2em 2em;
     background-repeat: repeat;
-    animation: App-Idle 1s linear infinite;
+    animation: Container-Idle 1s linear infinite;
     align-items: center;
     justify-content: center;
     display: flex;
     flex-direction: column;
+}
+
+container.nobg {
+    background: none;
+    animation: none;
+    justify-content:flex-start;
+    pointer-events: none;
+}
+
+sysmsg {
+    background-color: #ffc53c;
+    padding: 1em;
+    font-size: 1em;
+    max-width: 40vw;
+    width: max-content;
+    height: fit-content;
+    text-align: center;
+    margin-top: 0.5em;
+    animation: sysmsg 5.5s ease-in-out infinite;
+    transition-duration: 0.25s;
+}
+
+@keyframes sysmsg {
+    0% {
+        translate: 0 -100%;
+        opacity: 0;
+    }
+    10% {
+        translate: 0 0%;
+        opacity: 1;
+    }
+    70% {
+        opacity: 1;
+    }
+    100% {
+        opacity: 0;
+    }
+}
+
+flexcontainer {
+    width: 100%;
+    display: flex;
+    background-color: #60606099;
+    margin: 0.3em;
+    padding: 0.5em;
+    align-items: center;
+    justify-content: center;
+}
+
+button {
+    background-color: #707070aa;
+    outline: none;
+    border: none;
+    cursor: grab;
+    transition-duration: 0.25s;
+}
+
+button:hover {
+    scale: 1.01 1.01;
+    background-color: #707070ff;
+}
+
+input {
+    background-color: #707070aa;
+    outline: none;
+    border: none;
+    text-emphasis-color: #00000000;
+}
+
+input.accountInput {
+    background-color: #00000000;
 }
 
 h1 {
@@ -46,9 +117,10 @@ h1 {
 
 * {
     font-family: 'Courier New', Courier, monospace;
+    color: #fff;
 }
 
-@keyframes App-Idle {
+@keyframes Container-Idle {
     0% {
         background-position: 0px 0em;
     }
@@ -57,7 +129,7 @@ h1 {
     }
 }
 
-@keyframes App-Loaded {
+@keyframes Container-Loaded {
     0% {
         scale: 1 1;
     }
