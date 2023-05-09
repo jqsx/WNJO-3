@@ -85,6 +85,36 @@ flexcontainer {
     justify-content: center;
 }
 
+menu {
+    padding-right: 2em;
+    margin: 0px;
+    top: 0px;
+    bottom: 0px;
+    left: 0px;
+    position: absolute;
+    width: max-content;
+    translate: -90% 0;
+    height: 100vh;
+    background: linear-gradient(-70deg, #222 0% 59%, #303030 60% 100%);
+    transition-duration: 0.25s;
+    justify-content: center;
+    display: flex;
+    flex-flow: column;
+}
+
+menu button {
+    font-size: 2em;
+    margin-top: 0.5em;
+}
+
+menu * {
+    text-align: center;
+}
+
+menu:hover {
+    translate: 0 0;
+}
+
 button {
     background-color: #707070aa;
     outline: none;
@@ -107,6 +137,7 @@ input {
 
 input.accountInput {
     background-color: #00000000;
+    width: max-content;
 }
 
 h1 {

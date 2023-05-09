@@ -9,9 +9,19 @@ export default class LoginHandler extends Handler {
 
     process(data, ws) {
         if (!(ws instanceof ClientSocket)) return false;
-        const player = App.instance.Players.get(data.id);
-        App.instance.localPlayer = player;
-        console.log("Found and asigned local player.");
+        this.#findAndAsignLocalPlayer(data);
+    }
+
+    #findAndAsignLocalPlayer(data){
+        const loop = setInterval(() => {
+            const player = App.instance.Players.get(data.id);
+            if (player !== undefined) {
+                App.instance.localPlayer = player;
+                console.log("Found and asigned local player.");
+                document.getElementById('LIS').style.display = 'none';
+                clearInterval(loop);
+            }
+        }, 50);
     }
 
     /*

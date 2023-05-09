@@ -41,6 +41,7 @@ export default class ClientSocket extends WebSocket {
     setHandler(type, handler) {
         if (handler instanceof Handler) {
             this.#handlers.set(type, handler);
+            console.log(`Setup handler for ${type}`);
         }
         else {
             throw new TypeError("Parameter 'handler' must be a Handler");
@@ -50,6 +51,10 @@ export default class ClientSocket extends WebSocket {
     sendMessage(type, data) {
         if (this.readyState != this.OPEN) return;
         this.send(JSON.stringify({ TYPE: type, data: data }));
+    }
+
+    getmap() {
+        return this.#handlers.keys();
     }
 }
 

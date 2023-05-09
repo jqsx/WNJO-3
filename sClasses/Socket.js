@@ -17,7 +17,9 @@ export default class ServerSocket extends WebSocketServer {
         super({ port: config.WSPORT });
         this.playerHandler = new PlayerHandler(this);
         this.accountHandler = new AccountHandler(this);
-        process.on('exit', () => this.accountHandler.saveAccounts());
+        process.on('exit', () => {
+            this.accountHandler.saveAccounts();
+        });
         process.on('SIGINT', () => {
             process.exit();
         });
@@ -87,7 +89,7 @@ export default class ServerSocket extends WebSocketServer {
         this.Players.forEach(value => {
             index++;
             if (index % 4 != 0) {
-                outText += `PID:${value.id};POS:${value.position.toString()}   `
+                outText += `PID:${value.name};POS:${value.position.toString()}   `
             }
             else {
                 console.log(outText);

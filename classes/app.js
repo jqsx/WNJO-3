@@ -4,10 +4,8 @@ import LoginHandler from "./Handlers/LoginHandler.js";
 import PingHandler from "./Handlers/PingHandler.js";
 import PlayerHandler from "./Handlers/PlayerHandler.js";
 import Player from "./Player.js";
+import Textures from "./Textures.js";
 import vec from "./vec.js";
-
-const playerIMG = new Image();
-playerIMG.src = "../client/src/player/playeridle.png";
 
 export default class App {
     static instance;
@@ -27,6 +25,7 @@ export default class App {
         this.renderer.width = 1920;
         this.renderer.height = 1080;
         this.#ctx.imageSmoothingEnabled = false;
+        Textures.initializeImages();
     }
 
     #time = Date.now();
@@ -61,6 +60,8 @@ export default class App {
         this.#clientSocket.setHandler(PlayerHandler.getType(), new PlayerHandler());
         this.#clientSocket.setHandler(LoginHandler.getType(), new LoginHandler());
         this.#clientSocket.setHandler(ErrorLogHandler.getType(), new ErrorLogHandler());
+
+        console.log("Bing bong")
     }
 
     #initializeUserInput() {
@@ -84,6 +85,7 @@ export default class App {
 
     frameRender() {
         this.#ctx.clearRect(0, 0, this.renderer.width, this.renderer.height);
+        this.#ctx.fillStyle = 'white';
         this.Players.forEach((player) => {
             if (this.localPlayer !== undefined && this.localPlayer.id === player.id) 
                 return;
@@ -95,8 +97,8 @@ export default class App {
                 console.log(player.position);
             }
             let lP = this.#localPlayers.get(player.id);
-            lP.position.x = this.#lerp(lP.position.x, player.position.x, 0.1);
-            lP.position.y = this.#lerp(lP.position.y, player.position.y, 0.1);
+            lP.position.x = this.#lerp(lP.position.x, player.position.x, 0.3);
+            lP.position.y = this.#lerp(lP.position.y, player.position.y, 0.3);
             this.#drawPlayer(lP);
         });
 
@@ -106,7 +108,6 @@ export default class App {
 
         this.#ctx.font = "25px monospace";
         this.#ctx.fillText(Date.now() - this.#time + "ms", 0, 20, this.renderer.width);
-        this.#ctx.fillText("Avaiable only 16ms for entire render, if we want to render at 60fps", 0, 40, this.renderer.width);
     }
 
     log(message, code) {
@@ -133,10 +134,12 @@ export default class App {
     }
 
     #drawPlayer(player) {
+        let playerIMG = Textures.getTexture("player-idle")
         const size = 15;
         const screenPosition = this.#worldToScreen(player.position);
         const scale = new vec(playerIMG.width / 2, playerIMG.height / 2);
         this.#ctx.drawImage(playerIMG, screenPosition.x -(scale.x / 2) * size, screenPosition.y -(scale.y / 2) * size, scale.x * size, scale.x * size);
+        this.#ctx.fillText(player.name, screenPosition.x -(scale.x / 2) * size, screenPosition.y -(scale.y / 2) * size, 300);
     }
 
     playerInput() {

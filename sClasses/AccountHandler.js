@@ -51,7 +51,7 @@ export default class AccountHandler {
             // send error message
              // TODO: make a client side request error display
             if ("a" in message) {
-                let acc = this.LoadedAccounts.get(message.n);
+                let acc = this.LoadedAccounts.get(message.n.toLowerCase());
                 switch (message.a) {
                     case "CA":
                         // Create Account
@@ -61,7 +61,7 @@ export default class AccountHandler {
                                 name: message.n,
                                 pass: message.p
                             }
-                            this.LoadedAccounts.set(message.n, nAcc);
+                            this.LoadedAccounts.set(message.n.toLowerCase(), nAcc);
                             this.#initializeNewPlayer(ws, nAcc);
                         }
                         else {
@@ -98,7 +98,7 @@ export default class AccountHandler {
 
     #initializeNewPlayer(ws, account) {
         this.#ServerSocket.Clients.set(ws, {account: account._ID });
-        let player = this.#ServerSocket.Players.get(account._ID);
+        var player = this.#ServerSocket.Players.get(account._ID);
         if (player === undefined) {
             player = new Player({name: account.name});
             this.#ServerSocket.Players.set(account._ID, player);
@@ -106,14 +106,16 @@ export default class AccountHandler {
         let playerUpdate = this.#ServerSocket.getPlayersUpdateDataMessage();
         let loginUpdate = new DataMessage("LI", {id: player.id});
         this.#ServerSocket.sendMessage(ws, [playerUpdate, loginUpdate]);
+        console.log(player.id);
     }
 
-    saveAccounts() {
+    async saveAccounts() {
         console.log("Saving");
         const data = JSON.stringify(this.LoadedAccounts);
-        fs.writeFile('./AccountData/accounts.json', data, (err) => {
-            if (err) return console.error(err);
-            console.log("File has been saved");
+        fs.writeFile('../AccountData/accounts.json', data, err => {
+            if (err) throw err;
+            console.log("Saved");
         });
+        console.log("Done");
     }
 }
