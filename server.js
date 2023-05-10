@@ -18,5 +18,9 @@ export default class Server {
     this.app.get('/', (req, res) => {
       res.sendFile(path.resolve('./index.html'));
     });
+
+    this.app.get('/worlddata', (req, res) => {
+      res.send(JSON.stringify(websocket.ChunkData.getAllValues()));
+    })
   }
 };

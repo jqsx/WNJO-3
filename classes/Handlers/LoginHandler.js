@@ -10,6 +10,9 @@ export default class LoginHandler extends Handler {
     process(data, ws) {
         if (!(ws instanceof ClientSocket)) return false;
         this.#findAndAsignLocalPlayer(data);
+        if ("ql" in data) {
+            localStorage.setItem("ql", data.ql);
+        }
     }
 
     #findAndAsignLocalPlayer(data){

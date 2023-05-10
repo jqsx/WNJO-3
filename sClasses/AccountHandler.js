@@ -9,6 +9,7 @@ import config from "../config.js";
 export default class AccountHandler {
     #ServerSocket;
     LoadedAccounts = new Map();
+    QuickLog = new Map();
     constructor(socket) {
         if (socket instanceof ServerSocket) {
             this.#ServerSocket = socket;
@@ -40,12 +41,34 @@ export default class AccountHandler {
         if (!(ws instanceof WebSocket)) 
             return;
          else if (this.#ServerSocket.Clients.get(ws).account === null) {
+
+            if (message.a === 'QL') {
+                let acc = this.LoadedAccounts.get(this.QuickLog.get(message.ql));
+                if (acc !== undefined) {
+                    let ql = crypto.randomUUID();
+                    this.QuickLog.set(ql, acc.name);
+                    this.#initializeNewPlayer(ws, acc, ql);
+                    this.#ServerSocket.sendLog(ws, `Signed in with account ${acc.name}`);
+                }
+                else {
+                    this.#ServerSocket.sendErr(ws, "Error signing in with quicklog.");
+                }
+                return;
+            }
+
             if (!("n" in message && "p" in message)) {
                 this.#ServerSocket.sendErr(ws, "Invalid parameters");
                 return;
             } 
-            else if (message.n.length <= 3 || message.p.length <= 6 && message.n.length > 16 && message.p.length > 32) {
+            else if ((message.n.length <= 3 || message.p.length <= 6 && message.n.length > 16 && message.p.length > 32)) {
                 this.#ServerSocket.sendErr(ws, "Either the name, or the password exceeds the length bounds.\n\n The name can only be between 4 to 16 letters long and the password 7 to 32.");
+                return;
+            }
+
+            const nameRegex = /[a-z0-9A-Z]/
+
+            if (!nameRegex.test(message.n)) {
+                this.#ServerSocket.sendErr(ws, "invalid characters");
                 return;
             }
             // send error message
@@ -59,10 +82,12 @@ export default class AccountHandler {
                             let nAcc = { // create new account and uuid
                                 _ID: crypto.randomUUID(),
                                 name: message.n,
-                                pass: message.p
+                                pass: btoa(message.p)
                             }
+                            let ql = crypto.randomUUID();
+                            this.QuickLog.set(ql, nAcc.name);
                             this.LoadedAccounts.set(message.n.toLowerCase(), nAcc);
-                            this.#initializeNewPlayer(ws, nAcc);
+                            this.#initializeNewPlayer(ws, nAcc, ql);
                         }
                         else {
                             this.#ServerSocket.sendErr(ws, "An account with this name already exists.");
@@ -75,17 +100,16 @@ export default class AccountHandler {
                             // send error message to client
                             this.#ServerSocket.sendErr(ws, "The account you're trying to log in with doesn't exist.");
                         }
-                        else if (message.p === acc.pass) {
-                            this.#initializeNewPlayer(ws, acc);
+                        else if (btoa(message.p) === acc.pass) {
+                            let ql = crypto.randomUUID();
+                            this.QuickLog.set(ql, acc.name);
+                            this.#initializeNewPlayer(ws, acc, ql);
                             this.#ServerSocket.sendLog(ws, `Signed in with account ${acc.name}`);
                         }
                         else {
                             this.#ServerSocket.sendErr(ws, "The account you're trying to log in with doesn't exist.");
                         }
                         break;
-                    case "QL":
-                        // Quick Log
-                        console.log("Quicklog");
                     default:
                         // Err
                         console.error("Unrecognized procedure");
@@ -96,7 +120,7 @@ export default class AccountHandler {
         }
     }
 
-    #initializeNewPlayer(ws, account) {
+    #initializeNewPlayer(ws, account, quicklog) {
         this.#ServerSocket.Clients.set(ws, {account: account._ID });
         var player = this.#ServerSocket.Players.get(account._ID);
         if (player === undefined) {
@@ -104,18 +128,19 @@ export default class AccountHandler {
             this.#ServerSocket.Players.set(account._ID, player);
         }
         let playerUpdate = this.#ServerSocket.getPlayersUpdateDataMessage();
-        let loginUpdate = new DataMessage("LI", {id: player.id});
+        let loginUpdate = new DataMessage("LI", {id: player.id, ql: quicklog});
         this.#ServerSocket.sendMessage(ws, [playerUpdate, loginUpdate]);
         console.log(player.id);
     }
 
-    async saveAccounts() {
+    saveAccounts() {
         console.log("Saving");
-        const data = JSON.stringify(this.LoadedAccounts);
-        fs.writeFile('../AccountData/accounts.json', data, err => {
-            if (err) throw err;
-            console.log("Saved");
+        const jsondata = {};
+        this.LoadedAccounts.forEach((value, key) => {
+            jsondata[key] = value;
         });
-        console.log("Done");
+        const data = JSON.stringify(jsondata);
+        fs.writeFileSync('./AccountData/accounts.json', data);
+        console.log("Saved");
     }
 }

@@ -5,11 +5,13 @@ import Player from "../classes/Player.js";
 import os from 'os';
 import DataMessage from "./DataMessage.js";
 import AccountHandler from "./AccountHandler.js";
+import BiHashMap from "../classes/BiHashMap.js";
 
 export default class ServerSocket extends WebSocketServer {
     Clients = new Map(); // any type of connection 
     Players = new Map(); // when a client is associated with an account
     events = new Map();
+    ChunkData = new BiHashMap();
 
     playerHandler;
     accountHandler;
@@ -17,12 +19,7 @@ export default class ServerSocket extends WebSocketServer {
         super({ port: config.WSPORT });
         this.playerHandler = new PlayerHandler(this);
         this.accountHandler = new AccountHandler(this);
-        process.on('exit', () => {
-            this.accountHandler.saveAccounts();
-        });
-        process.on('SIGINT', () => {
-            process.exit();
-        });
+        this.registerExitProtocol();
         this.on('connection', (ws, req) => {
             console.log('new incoming connection...');
             this.Clients.set(ws, {account: null });
@@ -57,6 +54,17 @@ export default class ServerSocket extends WebSocketServer {
                 client.send(JSON.stringify([{ TYPE: "PUP", data: this.#getPlayers() }]))
             });
         }, 1000 / 10);
+
+        
+    }
+
+    registerExitProtocol() {
+        process.addListener('exit', () => {
+            this.accountHandler.saveAccounts();
+        });
+        process.addListener('SIGINT', () => {
+            process.exit();
+        });
     }
 
     #getPlayers() {

@@ -1,6 +1,6 @@
 import App from "../classes/app.js";
 
-const setup = () => {
+const setup = async () => {
     const dataDisplay = document.getElementById('ld');
     const app = new App();
 
@@ -13,6 +13,12 @@ const setup = () => {
 
     // load anything before that
     // such as map or stuff
+
+    const worlddata = await fetch('/worlddata', {method: "GET"});
+    const json = await worlddata.json();
+    json.forEach(value => {
+        app.ChunkData.set(value.chunkPosition.x, value.chunkPosition.y, value);
+    });
     
     dataDisplay.parentElement.style.display = 'none';
     app.start();

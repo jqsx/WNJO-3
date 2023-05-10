@@ -6,6 +6,7 @@ import PlayerHandler from "./Handlers/PlayerHandler.js";
 import Player from "./Player.js";
 import Textures from "./Textures.js";
 import vec from "./vec.js";
+import BiHashMap from './BiHashMap.js';
 
 export default class App {
     static instance;
@@ -19,6 +20,7 @@ export default class App {
     Players = new Map();
     #localPlayers = new Map();
     localPlayer;
+    ChunkData = new BiHashMap();
 
     constructor() {
         App.instance = this;
@@ -46,6 +48,12 @@ export default class App {
         this.#localPlayers = new Map();
         this.localPlayer = undefined;
         this.#clientSocket = new ClientSocket();
+        this.#clientSocket.onopen = () => {
+            let ql = localStorage.getItem('ql');
+            if (ql !== null) {
+                this.#clientSocket.sendMessage("ARP", { a: "QL", ql: ql });
+            }
+        };
         this.#clientSocket.onerror = () => {
             this.#clientSocket.close();
         };
