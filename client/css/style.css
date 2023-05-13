@@ -95,11 +95,12 @@ menu {
     width: max-content;
     translate: -90% 0;
     height: 100vh;
-    background: linear-gradient(-70deg, #222 0% 59%, #303030 60% 100%);
+    background: #222 ;
     transition-duration: 0.25s;
     justify-content: center;
     display: flex;
     flex-flow: column;
+    opacity: 0.25;
 }
 
 menu button {
@@ -112,6 +113,7 @@ menu * {
 }
 
 menu:hover {
+    opacity: 1;
     translate: 0 0;
 }
 
@@ -149,6 +151,7 @@ h1 {
 * {
     font-family: 'Courier New', Courier, monospace;
     color: #fff;
+    user-select: none;
 }
 
 @keyframes Container-Idle {
