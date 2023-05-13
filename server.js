@@ -20,7 +20,7 @@ export default class Server {
     });
 
     this.app.get('/worlddata', (req, res) => {
-      res.send(JSON.stringify(websocket.ChunkData.getAllValues()));
+      res.send(JSON.stringify(this.websocket.ChunkData.getAllValues()));
     })
   }
 };
