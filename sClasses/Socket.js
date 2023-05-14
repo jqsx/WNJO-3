@@ -6,6 +6,12 @@ import os from 'os';
 import DataMessage from "./DataMessage.js";
 import AccountHandler from "./AccountHandler.js";
 import BiHashMap from "../classes/BiHashMap.js";
+import Chunk from "../classes/WorldDataClasses/Chunk.js";
+import vec from "../classes/vec.js";
+
+// import SimplexNoise from 'simplex-noise';
+import WorldBlock from "../classes/WorldDataClasses/WorldBlock.js";
+const simplex = new SimplexNoise(123);
 
 export default class ServerSocket extends WebSocketServer {
     Clients = new Map(); // any type of connection 
@@ -19,6 +25,7 @@ export default class ServerSocket extends WebSocketServer {
         super({ port: config.WSPORT });
         this.playerHandler = new PlayerHandler(this);
         this.accountHandler = new AccountHandler(this);
+        this.generateSomeChunksIg();
         this.registerExitProtocol();
         this.on('connection', (ws, req) => {
             console.log('new incoming connection...');
@@ -58,6 +65,24 @@ export default class ServerSocket extends WebSocketServer {
         
     }
 
+    generateSomeChunksIg() {
+        for (let x = -16; x <= 16; x++) {
+            for (let y = -16; y <= 16; y++) {
+
+                let arr = [];
+                for (let _x = 0; _x < 16; _x++) {
+                    for (let _y = 0; _y < 16; _y++) {
+                        if (simplex.noise2D(x * 256 + _x * 16, y * 256 + _y * 16) < 0) {
+                            arr.push(new WorldBlock({position: new vec(x * 256 + _x * 16, y * 256 + _y * 16), texture: "block"}));
+                        }
+                    }
+                }
+
+                this.ChunkData.set(x, y, new Chunk(new vec(x, y), arr));
+            }
+        }
+    }
+
     registerExitProtocol() {
         process.addListener('exit', () => {
             this.accountHandler.saveAccounts();
@@ -92,6 +117,7 @@ export default class ServerSocket extends WebSocketServer {
         }
         console.log("Player count: " + this.Players.size);
         console.log("Client count: " + this.Clients.size);
+        console.log(`Chunks: ${this.ChunkData.Values.size}`);
         let index = 0;
         let outText = '';
         this.Players.forEach(value => {

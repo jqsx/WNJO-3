@@ -12,6 +12,7 @@ export default class LoginHandler extends Handler {
         this.#findAndAsignLocalPlayer(data);
         if ("ql" in data) {
             localStorage.setItem("ql", data.ql);
+            console.log("ql");
         }
     }
 
@@ -23,6 +24,7 @@ export default class LoginHandler extends Handler {
                 console.log("Found and asigned local player.");
                 document.getElementById('LIS').style.display = 'none';
                 clearInterval(loop);
+                App.instance.runGame();
             }
         }, 50);
     }

@@ -24,7 +24,10 @@ export default class BiHashMap {
     }
 
     get(x, y) {
-        return this.Values.get(x).get(y);
+        if (this.Values.has(x)) {
+            return this.Values.get(x).get(y);
+        } 
+        return null;
     }
 
     getAllValues() {

@@ -34,7 +34,9 @@ export default class App {
     start() {
         this.#initializeSocket();
         this.#initializeUserInput();
+    }
 
+    runGame() {
         setInterval(() => {
             document.getElementById('debug').innerText = "";
             this.#time = Date.now();
@@ -94,6 +96,9 @@ export default class App {
     frameRender() {
         this.#ctx.clearRect(0, 0, this.renderer.width, this.renderer.height);
         this.#ctx.fillStyle = 'white';
+
+        this.#drawChunks();
+
         this.Players.forEach((player) => {
             if (this.localPlayer !== undefined && this.localPlayer.id === player.id) 
                 return;
@@ -142,12 +147,26 @@ export default class App {
     }
 
     #drawPlayer(player) {
-        let playerIMG = Textures.getTexture("player-idle")
+        let playerIMG = Textures.getTexture("player-idle");
         const size = 15;
         const screenPosition = this.#worldToScreen(player.position);
         const scale = new vec(playerIMG.width / 2, playerIMG.height / 2);
         this.#ctx.drawImage(playerIMG, screenPosition.x -(scale.x / 2) * size, screenPosition.y -(scale.y / 2) * size, scale.x * size, scale.x * size);
         this.#ctx.fillText(player.name, screenPosition.x -(scale.x / 2) * size, screenPosition.y -(scale.y / 2) * size, 300);
+    }
+
+    #drawChunks() {
+        let block = Textures.getTexture("block");
+        const size = 15;
+        let chunkPos = new vec(Math.round(this.localPlayer.position.x / (256)), Math.round(this.localPlayer.position.y / (256)));
+        let chunk = this.ChunkData.get(chunkPos.x, chunkPos.y);
+        
+        let screenPosition = this.#worldToScreen(chunkPos.multiply(256));
+
+        this.#ctx.drawImage(block, screenPosition.x, screenPosition.y, 16 * size, 16 * size);
+
+        document.getElementById('debug').innerText += `\nChunk ${chunkPos}`;
+        document.getElementById('debug').innerText += `\nChunk ${JSON.stringify(chunk)}`;
     }
 
     playerInput() {

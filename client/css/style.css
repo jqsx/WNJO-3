@@ -85,6 +85,10 @@ flexcontainer {
     justify-content: center;
 }
 
+#ld {
+    text-align: center;
+}
+
 menu {
     padding-right: 2em;
     margin: 0px;
@@ -93,6 +97,7 @@ menu {
     left: 0px;
     position: absolute;
     width: max-content;
+    max-width: 12vw;
     translate: -90% 0;
     height: 100vh;
     background: #222 ;
@@ -101,6 +106,7 @@ menu {
     display: flex;
     flex-flow: column;
     opacity: 0.25;
+    border-right: #55555599 0.3em double;
 }
 
 menu button {
@@ -112,9 +118,14 @@ menu * {
     text-align: center;
 }
 
+menu p {
+    color: #ffffff55;
+}
+
 menu:hover {
     opacity: 1;
     translate: 0 0;
+    border-right: #55555500 0.3em double;
 }
 
 button {
@@ -154,6 +165,10 @@ h1 {
     user-select: none;
 }
 
+html {
+    overflow: hidden;
+}
+
 @keyframes Container-Idle {
     0% {
         background-position: 0px 0em;
@@ -170,4 +185,56 @@ h1 {
     100% {
         scale: 0 1;
     }
+}
+
+chat {
+    position: absolute;
+    bottom: 1vh;
+    right: 1vh;
+    min-height: 5vh;
+    height: fit-content;
+    max-height: 20vh;
+    width: 30vw;
+    background-color: #3d3d3d;
+    transition-duration: 0.25s;
+    opacity: 0.3;
+    display: flex;
+    flex-flow: column;
+}
+
+chat-box {
+    display: flex;
+    flex-flow: column;
+    overflow-y: auto;
+    gap: 1px;
+    margin-bottom: 0.1em;
+}
+
+chat:hover {
+    opacity: 0.9;
+}
+
+chat:focus {
+    opacity: 0.9;
+}
+
+chat-message {
+    width: 100%;
+    min-height: 2vh;
+    height: fit-content;
+    font-size: 2vh;
+    background-color: #99999988;
+    user-select: all;
+}
+
+chat-input {
+    height: 3vh;
+    width: 100%;
+    background-color: #222;
+}
+
+chat-input input {
+    width: 99%;
+    height: 100%;
+    font-size: 100%;
 }

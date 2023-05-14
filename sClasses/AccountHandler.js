@@ -43,7 +43,7 @@ export default class AccountHandler {
          else if (this.#ServerSocket.Clients.get(ws).account === null) {
 
             if (message.a === 'QL') {
-                let acc = this.LoadedAccounts.get(this.QuickLog.get(message.ql));
+                let acc = this.LoadedAccounts.get(this.QuickLog.get(message.ql).toLowerCase());
                 if (acc !== undefined) {
                     let ql = crypto.randomUUID();
                     this.QuickLog.set(ql, acc.name);

@@ -11,4 +11,8 @@ export default class vec {
     toString() {
         return `X:${this.x}Y:${this.y}`;
     }
+
+    multiply(value) {
+        return new vec(this.x * value, this.y * value);
+    }
 }
