@@ -11,7 +11,15 @@ import vec from "../classes/vec.js";
 
 // import SimplexNoise from 'simplex-noise';
 import WorldBlock from "../classes/WorldDataClasses/WorldBlock.js";
-const simplex = new SimplexNoise(123);
+import { createNoise2D } from "simplex-noise";
+const bingnoise = createNoise2D(() => {
+    return 12345;
+});
+
+const noise = (x, y) => {
+    let z = bingnoise(x, y);
+    return (z + 1) / 2.0;
+}
 
 export default class ServerSocket extends WebSocketServer {
     Clients = new Map(); // any type of connection 
@@ -72,8 +80,8 @@ export default class ServerSocket extends WebSocketServer {
                 let arr = [];
                 for (let _x = 0; _x < 16; _x++) {
                     for (let _y = 0; _y < 16; _y++) {
-                        if (simplex.noise2D(x * 256 + _x * 16, y * 256 + _y * 16) < 0) {
-                            arr.push(new WorldBlock({position: new vec(x * 256 + _x * 16, y * 256 + _y * 16), texture: "block"}));
+                        if (noise((x * 256 + _x * 16) / 256, (y * 256 + _y * 16) / 256) < 0.3 && noise(-(x * 256 + _x * 16) / 256, -(y * 256 + _y * 16) / 256) < 0.9) {
+                            arr.push(new WorldBlock({position: new vec(_x * 16, _y * 16), texture: "block"}));
                         }
                     }
                 }

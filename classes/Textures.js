@@ -11,7 +11,11 @@ export default class Textures {
     }
 
     static getTexture(name) {
-        return Textures.#textures.get(name);
+        let tex = Textures.#textures.get(name);
+        if (tex === undefined) {
+            return Textures.#textures.get("none");
+        }
+        return tex;
     }
 }
 
@@ -27,5 +31,9 @@ const imageData = [
     {
         name: "player-idle",
         src: "player/playeridle.png"
+    },
+    {
+        name: "chunk",
+        src: "chunker.png"
     }
 ]

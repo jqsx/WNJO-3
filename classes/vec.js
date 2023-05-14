@@ -15,4 +15,8 @@ export default class vec {
     multiply(value) {
         return new vec(this.x * value, this.y * value);
     }
+
+    add(other) {
+        return new vec(this.x + other.x, this.y + other.y);
+    }
 }

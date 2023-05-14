@@ -27,7 +27,7 @@ export default class PlayerHandler {
     #updatePlayer(player, message) {
         if (!(player instanceof Player)) return;
         const position = message["position"];
-        player.position.x = position.x;
-        player.position.y = position.y;
+        if (Math.abs(player.position.x - position.x) < 5) player.position.x = position.x;
+        if (Math.abs(player.position.y - position.y) < 5) player.position.y = position.y;
     }
 }

@@ -21,6 +21,8 @@ export default class LoginHandler extends Handler {
             const player = App.instance.Players.get(data.id);
             if (player !== undefined) {
                 App.instance.localPlayer = player;
+                App.instance.cameraPosition.x = player.position.x;
+                App.instance.cameraPosition.y = player.position.y;
                 console.log("Found and asigned local player.");
                 document.getElementById('LIS').style.display = 'none';
                 clearInterval(loop);

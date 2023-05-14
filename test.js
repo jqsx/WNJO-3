@@ -1,8 +1,9 @@
-import BiHashMap from "./classes/BiHashMap.js";
+import { createNoise2D } from "simplex-noise";
 
-const hash = new BiHashMap();
+const noise = createNoise2D(() => 1234);
 
-hash.set(1, 2, "aa");
-hash.set(2, 3, "nnn");
-
-console.log(JSON.stringify(hash));
+for (let x = 0; x < 100; x++) {
+    for (let y = 0; y < 100; y++) {
+        console.log(noise(x/ 10.0, y / 10.0));
+    }
+}

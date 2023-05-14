@@ -17,6 +17,10 @@ export default class PlayerHandler extends Handler {
                 let player = App.instance.Players.get(element.id);
                 player.position.x = element.position.x;
                 player.position.y = element.position.y;
+                if (player === App.instance.localPlayer) {
+                    if (Math.abs(player.position.x - App.instance.cameraPosition.x) > 5) App.instance.cameraPosition.x = player.position.x;
+                    if (Math.abs(player.position.y - App.instance.cameraPosition.y) > 5) App.instance.cameraPosition.y = player.position.y;
+                }
             }
             else {
                 App.instance.Players.set(element.id, new Player(element));

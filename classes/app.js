@@ -7,6 +7,7 @@ import Player from "./Player.js";
 import Textures from "./Textures.js";
 import vec from "./vec.js";
 import BiHashMap from './BiHashMap.js';
+import Chunk from "./WorldDataClasses/Chunk.js";
 
 export default class App {
     static instance;
@@ -37,11 +38,30 @@ export default class App {
     }
 
     runGame() {
-        setInterval(() => {
+        if (this.#clientSocket.readyState !== this.#clientSocket.OPEN) {
+            this.log("Game has started but client socket is not ready...", 300);
+            setTimeout(() => {
+                this.runGame();
+            }, 500);
+        }
+        else {
+            this.#beginUpdateLoop();
+        }
+    }
+
+    #beginUpdateLoop() {
+        const loop = setInterval(() => {
             document.getElementById('debug').innerText = "";
             this.#time = Date.now();
             this.playerInput();
             this.frameRender();
+            if (this.#clientSocket.readyState !== this.#clientSocket.OPEN) {
+                clearInterval(loop);
+                this.log("Socket conn err", 400);
+                setTimeout(() => {
+                    window.location.reload();
+                }, 1000);
+            }
         }, 1000 / 60);
     }
 
@@ -120,7 +140,8 @@ export default class App {
         }
 
         this.#ctx.font = "25px monospace";
-        this.#ctx.fillText(Date.now() - this.#time + "ms", 0, 20, this.renderer.width);
+        let timespan = Date.now() - this.#time;
+        this.#ctx.fillText(timespan + "ms", 0, 20, this.renderer.width);
     }
 
     log(message, code) {
@@ -156,17 +177,60 @@ export default class App {
     }
 
     #drawChunks() {
+        let localPosition = new vec(Number(this.localPlayer.position.x), Number(this.localPlayer.position.y));
         let block = Textures.getTexture("block");
+        let texture_chunk = Textures.getTexture("chunk");
         const size = 15;
-        let chunkPos = new vec(Math.round(this.localPlayer.position.x / (256)), Math.round(this.localPlayer.position.y / (256)));
+        let chunkPos = new vec(Math.floor(this.localPlayer.position.x / (256)), Math.floor(this.localPlayer.position.y / (256))); 
         let chunk = this.ChunkData.get(chunkPos.x, chunkPos.y);
-        
-        let screenPosition = this.#worldToScreen(chunkPos.multiply(256));
 
-        this.#ctx.drawImage(block, screenPosition.x, screenPosition.y, 16 * size, 16 * size);
+        var dir = new vec(chunk.chunkPosition.x * 256 + 128, chunk.chunkPosition.y * 256 + 128);
+
+        this.#ctx.fillStyle = '#0000ff55';
+        let cSc = this.#worldToScreen(dir);
+        this.#ctx.fillRect(cSc.x-25, cSc.y-25, 50, 50);
+
+        const ooftSign = (n) => {
+            return n > 0 ? 1 : -1;
+        }
+
+        dir.x -= localPosition.x;
+        dir.y -= localPosition.y;
+        dir = new vec(ooftSign(dir.x / 128), ooftSign(dir.y / 128));
+
+        var chunksRendered = 0;
+
+        for (let x = 0; Math.abs(x) <= Math.abs(dir.x); x += ooftSign(dir.x)) {
+            for (let y = 0; Math.abs(y) <= Math.abs(dir.y); y += ooftSign(dir.y)) {
+                let _chank = this.ChunkData.get(chunkPos.x - x, chunkPos.y - y);
+                if (_chank instanceof Chunk) {
+
+                    let cSP = this.#worldToScreen(_chank.chunkPosition.multiply(256).add(new vec(256, 0)));
+                    this.#ctx.drawImage(texture_chunk, cSP.x, cSP.y, (16 * 10 * 16), (16 * 10 * 16));
+        
+                    _chank.worldBlocks.forEach(wb => {
+                        let screenPosition = this.#worldToScreen(new vec(wb.position.x + 16, wb.position.y).add(_chank.chunkPosition.multiply(256)));
+                        if (screenPosition.x > -16 * 10 && screenPosition.x < this.renderer.width && screenPosition.y > -16 * 10 && screenPosition.y < this.renderer.height) {
+                            this.#ctx.drawImage(block, screenPosition.x, screenPosition.y, (16 * 10), (16 * 10));
+                            this.#ctx.fillText(JSON.stringify(screenPosition), screenPosition.x, screenPosition.y, 300);
+                            this.#ctx.fillText(JSON.stringify(_chank.chunkPosition), screenPosition.x, screenPosition.y - 30, 300);
+                        }
+                    });
+
+                    chunksRendered++;
+                }
+            }
+        }
+
+        document.getElementById('debug').innerText += `\ndir ${dir}`;
+
+        // this.#ctx.fillStyle = '#0000ff55';
+        // let cSc = this.#worldToScreen(chunkPos.multiply(256));
+        // this.#ctx.fillRect(cSc.x, cSc.y, 2560, 2560);
+        this.#ctx.fillStyle = 'white';
 
         document.getElementById('debug').innerText += `\nChunk ${chunkPos}`;
-        document.getElementById('debug').innerText += `\nChunk ${JSON.stringify(chunk)}`;
+        document.getElementById('debug').innerText += `\nChunks rendered ${chunksRendered}`;
     }
 
     playerInput() {
@@ -182,7 +246,7 @@ export default class App {
         }
         document.getElementById('debug').innerText += "\nCamera Position: " + this.cameraPosition.toString();
 
-        this.#clientSocket.sendMessage("PUP", {position: this.cameraPosition});
+        if (x !== 0 || y !== 0) this.#clientSocket.sendMessage("PUP", {position: this.cameraPosition});
     }
 
     #toInt(bool) {
