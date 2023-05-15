@@ -3,14 +3,16 @@ import ErrorLogHandler from "./Handlers/ErrorLogHandler.js";
 import LoginHandler from "./Handlers/LoginHandler.js";
 import PingHandler from "./Handlers/PingHandler.js";
 import PlayerHandler from "./Handlers/PlayerHandler.js";
-import Player from "./Player.js";
 import Textures from "./Textures.js";
 import vec from "./vec.js";
 import BiHashMap from './BiHashMap.js';
-import Chunk from "./WorldDataClasses/Chunk.js";
+import InventoryRender from "./rendering/InventoryRenderer.js";
+import PlayerRenderer from "./rendering/PlayerRenderer.js";
+import ChunkRenderer from "./rendering/ChunkRenderer.js";
 
 export default class App {
     static instance;
+    static mousePosition = new vec(0, 0);
     cameraPosition = new vec(0, 0);
     renderer = document.createElement("canvas");
     #ctx = this.renderer.getContext("2d");
@@ -19,9 +21,14 @@ export default class App {
     #keysDown = [];
 
     Players = new Map();
-    #localPlayers = new Map();
     localPlayer;
     ChunkData = new BiHashMap();
+
+    renderingStack = {
+        InventoryRender: new InventoryRender(this, this.#ctx),
+        PlayerRenderer: new PlayerRenderer(this, this.#ctx),
+        ChunkRenderer: new ChunkRenderer(this, this.#ctx)
+    };
 
     constructor() {
         App.instance = this;
@@ -67,7 +74,6 @@ export default class App {
 
     #initializeSocket() {
         this.Players = new Map();
-        this.#localPlayers = new Map();
         this.localPlayer = undefined;
         this.#clientSocket = new ClientSocket();
         this.#clientSocket.onopen = () => {
@@ -107,6 +113,10 @@ export default class App {
                 }
             }
         });
+        window.addEventListener('mousemove', (ev) => {
+            App.mousePosition.x = ev.pageX;
+            App.mousePosition.y = ev.pageY;
+        })
     }
 
     isKeyDown(key) {
@@ -117,27 +127,13 @@ export default class App {
         this.#ctx.clearRect(0, 0, this.renderer.width, this.renderer.height);
         this.#ctx.fillStyle = 'white';
 
-        this.#drawChunks();
+        // render stack
 
-        this.Players.forEach((player) => {
-            if (this.localPlayer !== undefined && this.localPlayer.id === player.id) 
-                return;
-            
-            if (!this.#localPlayers.has(player.id)) {
-                let lp = new Player(player);
-                this.#localPlayers.set(player.id, lp);
-                lp.position = new vec(player.position.x, player.position.y);
-                console.log(player.position);
-            }
-            let lP = this.#localPlayers.get(player.id);
-            lP.position.x = this.#lerp(lP.position.x, player.position.x, 0.3);
-            lP.position.y = this.#lerp(lP.position.y, player.position.y, 0.3);
-            this.#drawPlayer(lP);
-        });
+        this.renderingStack.ChunkRenderer.render();
+        this.renderingStack.PlayerRenderer.render();
+        this.renderingStack.InventoryRender.render();
 
-        if (this.localPlayer !== undefined) {
-            this.#drawPlayer(this.localPlayer);
-        }
+        // end of render stack
 
         this.#ctx.font = "25px monospace";
         let timespan = Date.now() - this.#time;
@@ -167,72 +163,6 @@ export default class App {
         }, 5000);
     }
 
-    #drawPlayer(player) {
-        let playerIMG = Textures.getTexture("player-idle");
-        const size = 15;
-        const screenPosition = this.#worldToScreen(player.position);
-        const scale = new vec(playerIMG.width / 2, playerIMG.height / 2);
-        this.#ctx.drawImage(playerIMG, screenPosition.x -(scale.x / 2) * size, screenPosition.y -(scale.y / 2) * size, scale.x * size, scale.x * size);
-        this.#ctx.fillText(player.name, screenPosition.x -(scale.x / 2) * size, screenPosition.y -(scale.y / 2) * size, 300);
-    }
-
-    #drawChunks() {
-        let localPosition = new vec(Number(this.localPlayer.position.x), Number(this.localPlayer.position.y));
-        let block = Textures.getTexture("block");
-        let texture_chunk = Textures.getTexture("chunk");
-        const size = 15;
-        let chunkPos = new vec(Math.floor(this.localPlayer.position.x / (256)), Math.floor(this.localPlayer.position.y / (256))); 
-        let chunk = this.ChunkData.get(chunkPos.x, chunkPos.y);
-
-        var dir = new vec(chunk.chunkPosition.x * 256 + 128, chunk.chunkPosition.y * 256 + 128);
-
-        this.#ctx.fillStyle = '#0000ff55';
-        let cSc = this.#worldToScreen(dir);
-        this.#ctx.fillRect(cSc.x-25, cSc.y-25, 50, 50);
-
-        const ooftSign = (n) => {
-            return n > 0 ? 1 : -1;
-        }
-
-        dir.x -= localPosition.x;
-        dir.y -= localPosition.y;
-        dir = new vec(ooftSign(dir.x / 128), ooftSign(dir.y / 128));
-
-        var chunksRendered = 0;
-
-        for (let x = 0; Math.abs(x) <= Math.abs(dir.x); x += ooftSign(dir.x)) {
-            for (let y = 0; Math.abs(y) <= Math.abs(dir.y); y += ooftSign(dir.y)) {
-                let _chank = this.ChunkData.get(chunkPos.x - x, chunkPos.y - y);
-                if (_chank instanceof Chunk) {
-
-                    let cSP = this.#worldToScreen(_chank.chunkPosition.multiply(256).add(new vec(256, 0)));
-                    this.#ctx.drawImage(texture_chunk, cSP.x, cSP.y, (16 * 10 * 16), (16 * 10 * 16));
-        
-                    _chank.worldBlocks.forEach(wb => {
-                        let screenPosition = this.#worldToScreen(new vec(wb.position.x + 16, wb.position.y).add(_chank.chunkPosition.multiply(256)));
-                        if (screenPosition.x > -16 * 10 && screenPosition.x < this.renderer.width && screenPosition.y > -16 * 10 && screenPosition.y < this.renderer.height) {
-                            this.#ctx.drawImage(block, screenPosition.x, screenPosition.y, (16 * 10), (16 * 10));
-                            this.#ctx.fillText(JSON.stringify(screenPosition), screenPosition.x, screenPosition.y, 300);
-                            this.#ctx.fillText(JSON.stringify(_chank.chunkPosition), screenPosition.x, screenPosition.y - 30, 300);
-                        }
-                    });
-
-                    chunksRendered++;
-                }
-            }
-        }
-
-        document.getElementById('debug').innerText += `\ndir ${dir}`;
-
-        // this.#ctx.fillStyle = '#0000ff55';
-        // let cSc = this.#worldToScreen(chunkPos.multiply(256));
-        // this.#ctx.fillRect(cSc.x, cSc.y, 2560, 2560);
-        this.#ctx.fillStyle = 'white';
-
-        document.getElementById('debug').innerText += `\nChunk ${chunkPos}`;
-        document.getElementById('debug').innerText += `\nChunks rendered ${chunksRendered}`;
-    }
-
     playerInput() {
         let x = this.#toInt(this.isKeyDown("d")) + this.#toInt(this.isKeyDown("a")) * -1;
         let y = this.#toInt(this.isKeyDown("w")) + this.#toInt(this.isKeyDown("s")) * -1;
@@ -251,18 +181,6 @@ export default class App {
 
     #toInt(bool) {
         return bool ? 1 : 0;
-    }
-
-    #worldToScreen(position = vec) {
-        return new vec(-(position.x - this.cameraPosition.x) * 10 + this.renderer.width / 2, (position.y - this.cameraPosition.y) * 10 + this.renderer.height / 2);
-    }
-
-    #lerp(a, b, t) {
-        return a + (b - a) * this.#clamp(t, 0, 1);
-    }
-
-    #clamp(n, min, max) {
-        return Math.min(Math.max(n, min), max);
     }
 
     AccountRetrieval(type) {

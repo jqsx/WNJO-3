@@ -82,7 +82,11 @@ export default class AccountHandler {
                             let nAcc = { // create new account and uuid
                                 _ID: crypto.randomUUID(),
                                 name: message.n,
-                                pass: btoa(message.p)
+                                pass: btoa(message.p),
+                                rank: "player",
+                                creationDate: Date.now(),
+                                money: 0,
+                                desc: ""
                             }
                             let ql = crypto.randomUUID();
                             this.QuickLog.set(ql, nAcc.name);
