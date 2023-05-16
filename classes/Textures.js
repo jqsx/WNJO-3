@@ -29,11 +29,23 @@ const imageData = [
         src: "block.png"
     },
     {
+        name: "stone",
+        src: "stone.png"
+    },
+    {
         name: "player-idle",
         src: "player/playeridle.png"
     },
     {
         name: "chunk",
         src: "chunker.png"
+    },
+    {
+        name: "tree",
+        src: "tree.png"
+    },
+    {
+        name: "smalltree",
+        src: "smalltree.png"
     }
 ]
