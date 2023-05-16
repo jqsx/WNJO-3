@@ -118,6 +118,7 @@ export default class AccountHandler {
                         // Err
                         console.error("Unrecognized procedure");
                         this.#ServerSocket.sendErr(ws, "Unrecognized procedure");
+                        
                         break;
                 }
             }

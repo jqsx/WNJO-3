@@ -20,7 +20,7 @@ export default class ChunkRenderer extends RenderLayer {
     render() {
         const localPlayer = this.#app.localPlayer;
         let localPosition = new vec(Number(localPlayer.position.x), Number(localPlayer.position.y));
-        let block = Textures.getTexture("block");
+        // let block = Textures.getTexture("block");
         let texture_chunk = Textures.getTexture("chunk");
         const size = 15;
         let chunkPos = new vec(Math.floor(localPlayer.position.x / (256)), Math.floor(localPlayer.position.y / (256))); 
@@ -53,7 +53,7 @@ export default class ChunkRenderer extends RenderLayer {
                     _chank.worldBlocks.forEach(wb => {
                         let screenPosition = this.worldToScreen(new vec(wb.position.x + 16, wb.position.y).add(_chank.chunkPosition.multiply(256)));
                         if (screenPosition.x > -16 * 10 && screenPosition.x < this.#app.renderer.width && screenPosition.y > -16 * 10 && screenPosition.y < this.#app.renderer.height) {
-                            this.#ctx.drawImage(block, screenPosition.x, screenPosition.y, (16 * 10), (16 * 10));
+                            this.#ctx.drawImage(Textures.getTexture(wb.texture), screenPosition.x, screenPosition.y, (16 * 10), (16 * 10));
                             this.#ctx.fillText(JSON.stringify(screenPosition), screenPosition.x, screenPosition.y, 300);
                             this.#ctx.fillText(JSON.stringify(_chank.chunkPosition), screenPosition.x, screenPosition.y - 30, 300);
                         }

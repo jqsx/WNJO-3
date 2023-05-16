@@ -2,6 +2,7 @@ import App from "../app.js";
 import RenderLayer from "./RenderLayer.js";
 import Textures from "../Textures.js";
 import vec from "../vec.js";
+import Player from "../Player.js";
 
 export default class PlayerRenderer extends RenderLayer {
     #app;
