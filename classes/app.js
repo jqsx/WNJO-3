@@ -17,6 +17,7 @@ export default class App {
     renderer = document.createElement("canvas");
     #ctx = this.renderer.getContext("2d");
     #clientSocket = ClientSocket;
+    deltaTime = 0;
 
     #keysDown = [];
 
@@ -38,7 +39,7 @@ export default class App {
         Textures.initializeImages();
     }
 
-    #time = Date.now();
+    #time = performance.now();
     start() {
         this.#initializeSocket();
         this.#initializeUserInput();
@@ -57,9 +58,8 @@ export default class App {
     }
 
     #beginUpdateLoop() {
-        const loop = setInterval(() => {
+        const loop = () => {
             document.getElementById('debug').innerText = "";
-            this.#time = Date.now();
             this.playerInput();
             this.frameRender();
             if (this.#clientSocket.readyState !== this.#clientSocket.OPEN) {
@@ -69,7 +69,16 @@ export default class App {
                     window.location.reload();
                 }, 1000);
             }
-        }, 1000 / 60);
+            this.deltaTime = (performance.now() - this.#time) / 1000.0;
+            this.deltaTime = Math.max(Math.min(this.deltaTime, 1), 0);
+            this.#time = performance.now();
+            window.requestAnimationFrame(() => {
+                loop();
+            });
+        };
+        window.requestAnimationFrame(() => {
+            loop();
+        });
     }
 
     #initializeSocket() {
@@ -136,8 +145,7 @@ export default class App {
         // end of render stack
 
         this.#ctx.font = "25px monospace";
-        let timespan = Date.now() - this.#time;
-        this.#ctx.fillText(timespan + "ms", 0, 20, this.renderer.width);
+        this.#ctx.fillText(Math.floor(1 / this.deltaTime)+ "FPS", 0, 20, this.renderer.width);
     }
 
     log(message, code) {
@@ -166,8 +174,8 @@ export default class App {
     playerInput() {
         let x = this.#toInt(this.isKeyDown("d")) + this.#toInt(this.isKeyDown("a")) * -1;
         let y = this.#toInt(this.isKeyDown("w")) + this.#toInt(this.isKeyDown("s")) * -1;
-        this.cameraPosition.x -= x;
-        this.cameraPosition.y -= y;
+        this.cameraPosition.x -= x * 45 * this.deltaTime;
+        this.cameraPosition.y -= y * 45 * this.deltaTime;
 
         if (this.localPlayer !== undefined) {
             this.localPlayer.position.x = this.cameraPosition.x;

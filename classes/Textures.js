@@ -46,6 +46,10 @@ const imageData = [
     },
     {
         name: "smalltree",
-        src: "smalltree.png"
+        src: "shortgrass.png"
+    },
+    {
+        name: "mushroom",
+        src: "mashroom.png"
     }
 ]

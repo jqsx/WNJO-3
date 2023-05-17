@@ -33,8 +33,8 @@ export default class PlayerRenderer extends RenderLayer {
             let lP = this.#localPlayers.get(player.id);
             let norm = player.position.sub(lP.position);
             let dist = norm.mag();
-            lP.position.x += norm.x * this.clamp(dist, 0, 0.1);
-            lP.position.y += norm.y * this.clamp(dist, 0, 0.1);
+            lP.position.x += norm.x * this.clamp(dist, 0, 0.3);
+            lP.position.y += norm.y * this.clamp(dist, 0, 0.3);
 
             // lP.position.x = this.lerp(lP.position.x, player.position.x, 0.3);
             // lP.position.y = this.lerp(lP.position.y, player.position.y, 0.3);

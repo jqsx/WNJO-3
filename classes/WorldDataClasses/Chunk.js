@@ -3,6 +3,7 @@ import vec from "../vec.js";
 
 export default class Chunk {
     chunkPosition = new vec(0, 0);
+    biome= "forest";
     worldBlocks = [];
     
     constructor(position, data) {

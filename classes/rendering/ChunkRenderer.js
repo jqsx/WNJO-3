@@ -46,19 +46,32 @@ export default class ChunkRenderer extends RenderLayer {
             for (let y = 0; Math.abs(y) <= Math.abs(dir.y); y += ooftSign(dir.y)) {
                 let _chank = this.#app.ChunkData.get(chunkPos.x - x, chunkPos.y - y);
                 if (_chank instanceof Chunk) {
-
                     let cSP = this.worldToScreen(_chank.chunkPosition.multiply(256).add(new vec(256, 0)));
                     this.#ctx.drawImage(texture_chunk, cSP.x, cSP.y, (16 * 10 * 16), (16 * 10 * 16));
-        
+                }
+            }
+        }
+
+        for (let x = 0; Math.abs(x) <= Math.abs(dir.x); x += ooftSign(dir.x)) {
+            for (let y = 0; Math.abs(y) <= Math.abs(dir.y); y += ooftSign(dir.y)) {
+                let _chank = this.#app.ChunkData.get(chunkPos.x - x, chunkPos.y - y);
+                if (_chank instanceof Chunk) {
                     _chank.worldBlocks.forEach(wb => {
+                        const tex = Textures.getTexture(wb.texture);
                         let screenPosition = this.worldToScreen(new vec(wb.position.x + 16, wb.position.y).add(_chank.chunkPosition.multiply(256)));
-                        if (screenPosition.x > -16 * 10 && screenPosition.x < this.#app.renderer.width && screenPosition.y > -16 * 10 && screenPosition.y < this.#app.renderer.height) {
-                            this.#ctx.drawImage(Textures.getTexture(wb.texture), screenPosition.x, screenPosition.y, (16 * 10), (16 * 10));
-                            // this.#ctx.fillText(JSON.stringify(screenPosition), screenPosition.x, screenPosition.y, 300);
-                            // this.#ctx.fillText(JSON.stringify(_chank.chunkPosition), screenPosition.x, screenPosition.y - 30, 300);
+                        if (screenPosition.x > -tex.width * 20 && screenPosition.x < this.#app.renderer.width && screenPosition.y > -tex.height * 10 && screenPosition.y < this.#app.renderer.height + (tex.height - 16) * 10) {
+                            if (!wb.isSolid) {
+                                this.#ctx.fillStyle = '#33333366';
+                                this.#ctx.beginPath();
+                                this.#ctx.ellipse(screenPosition.x + 16 * 5, screenPosition.y + 16 * 9, 16 * 3, 16 * 1, 0, 0, Math.PI * 2);
+                                this.#ctx.fill();
+                                this.#ctx.closePath();
+                            }
+                            this.#ctx.drawImage(tex, screenPosition.x + (8 - tex.width / 2) * 10, screenPosition.y + (16 - tex.height) * 10, (tex.width * 10), (tex.width * 10));
+                            // this.#ctx.strokeStyle = '#ff0000';
+                            // this.#ctx.strokeRect(screenPosition.x, screenPosition.y, 16 * 10, 16 * 10);
                         }
                     });
-
                     chunksRendered++;
                 }
             }
