@@ -53,5 +53,8 @@ export default class PlayerRenderer extends RenderLayer {
         const scale = new vec(playerIMG.width / 2, playerIMG.height / 2);
         this.#ctx.drawImage(playerIMG, screenPosition.x - (scale.x * size / 4), screenPosition.y - (scale.y * size / 2), scale.x * size, scale.x * size);
         this.#ctx.fillText(player.name, screenPosition.x - (scale.x * size / 4), screenPosition.y - (scale.y * size / 2), 300);
+
+        this.#ctx.strokeStyle = '#ff0000';
+        this.#ctx.strokeRect(screenPosition.x - 35, screenPosition.y - 55, 70, 110);
     }
 }

@@ -34,4 +34,9 @@ export default class vec {
         let m = this.mag();
         return new vec(this.x / m, this.y / m);
     }
+
+    distance(other) {
+        let diff = this.sub(other);
+        return diff.mag();
+    }
 }

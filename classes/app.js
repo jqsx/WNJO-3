@@ -9,6 +9,7 @@ import BiHashMap from './BiHashMap.js';
 import InventoryRender from "./rendering/InventoryRenderer.js";
 import PlayerRenderer from "./rendering/PlayerRenderer.js";
 import ChunkRenderer from "./rendering/ChunkRenderer.js";
+import { PlayerCollision } from "./PlayerCollision.js";
 
 export default class App {
     static instance;
@@ -30,6 +31,8 @@ export default class App {
         PlayerRenderer: new PlayerRenderer(this, this.#ctx),
         ChunkRenderer: new ChunkRenderer(this, this.#ctx)
     };
+
+    playerCollider = new PlayerCollision(this);
 
     constructor() {
         App.instance = this;
@@ -176,6 +179,11 @@ export default class App {
         let y = this.#toInt(this.isKeyDown("w")) + this.#toInt(this.isKeyDown("s")) * -1;
         this.cameraPosition.x -= x * 45 * this.deltaTime;
         this.cameraPosition.y -= y * 45 * this.deltaTime;
+
+        if (this.playerCollider.collisionCheck()) {
+            this.cameraPosition.x += x * 45 * this.deltaTime;
+        this.cameraPosition.y += y * 45 * this.deltaTime;
+        }
 
         if (this.localPlayer !== undefined) {
             this.localPlayer.position.x = this.cameraPosition.x;

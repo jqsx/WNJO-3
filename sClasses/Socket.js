@@ -83,16 +83,16 @@ export default class ServerSocket extends WebSocketServer {
                         if (biome < 0.7) {
                             let tP = new vec((x * 256 + _x * 16) / 256, (y * 256 + _y * 16) / 256);
                             if (noise(tP.x, tP.y) < 0.3 && noise(tP.x, tP.y) < 0.6) {
-                                arr.push(new WorldBlock({position: new vec(_x * 16, _y * 16), texture: "block"}));
+                                arr.push(new WorldBlock({position: new vec(_x * 16, _y * 16), texture: "block", scale: new vec(16, 16)}));
                             }
-                            else if (noise(tP.x, tP.y) > 0.4 && noise(tP.x * 8, tP.y * 8) > 0.4 && (x + y) % 2 == 0) {
+                            else if (noise(tP.x, tP.y) > 0.4 && noise(tP.x * 8, tP.y * 8) > 0.4 && (_x + _y) % 2 == 0) {
                                 arr.push(new WorldBlock({position: new vec(_x * 16, _y * 16), texture: Math.random() < 0.5 ? "tree" : "smalltree", isSolid: false}));
                             }
                         }
                         else {
                             if (biome > 0.73) {
                                 let tP = new vec((x * 256 + _x * 16) / 256, (y * 256 + _y * 16) / 256);
-                                if (noise(tP.x, tP.y) > 0.4 && noise(tP.x * 8, tP.y * 8) > 0.4 && (x + y) % 3 == 0) {
+                                if (noise(tP.x, tP.y) > 0.4 && noise(tP.x * 8, tP.y * 8) > 0.4 && (_x + _y) % 10 == 0) {
                                     arr.push(new WorldBlock({position: new vec(_x * 16, _y * 16), texture: "mushroom", isSolid: false}));
                                 }
                             } 

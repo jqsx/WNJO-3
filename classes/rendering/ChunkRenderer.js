@@ -28,9 +28,9 @@ export default class ChunkRenderer extends RenderLayer {
 
         var dir = new vec(chunk.chunkPosition.x * 256 + 128, chunk.chunkPosition.y * 256 + 128);
 
-        this.#ctx.fillStyle = '#0000ff55';
-        let cSc = this.worldToScreen(dir);
-        this.#ctx.fillRect(cSc.x-25, cSc.y-25, 50, 50);
+        // this.#ctx.fillStyle = '#0000ff55';
+        // let cSc = this.worldToScreen(dir);
+        // this.#ctx.fillRect(cSc.x-25, cSc.y-25, 50, 50);
 
         const ooftSign = (n) => {
             return n > 0 ? 1 : -1;
@@ -59,7 +59,7 @@ export default class ChunkRenderer extends RenderLayer {
                     _chank.worldBlocks.forEach(wb => {
                         const tex = Textures.getTexture(wb.texture);
                         let screenPosition = this.worldToScreen(new vec(wb.position.x + 16, wb.position.y).add(_chank.chunkPosition.multiply(256)));
-                        if (screenPosition.x > -tex.width * 20 && screenPosition.x < this.#app.renderer.width && screenPosition.y > -tex.height * 10 && screenPosition.y < this.#app.renderer.height + (tex.height - 16) * 10) {
+                        if (screenPosition.x > -tex.width * 20 && screenPosition.x < this.#app.renderer.width && screenPosition.y > -tex.height * 20 && screenPosition.y < this.#app.renderer.height + (tex.height - 16) * 10) {
                             if (!wb.isSolid) {
                                 this.#ctx.fillStyle = '#33333366';
                                 this.#ctx.beginPath();
@@ -68,8 +68,8 @@ export default class ChunkRenderer extends RenderLayer {
                                 this.#ctx.closePath();
                             }
                             this.#ctx.drawImage(tex, screenPosition.x + (8 - tex.width / 2) * 10, screenPosition.y + (16 - tex.height) * 10, (tex.width * 10), (tex.width * 10));
-                            // this.#ctx.strokeStyle = '#ff0000';
-                            // this.#ctx.strokeRect(screenPosition.x, screenPosition.y, 16 * 10, 16 * 10);
+                            this.#ctx.strokeStyle = '#ff0000';
+                            this.#ctx.strokeRect(screenPosition.x, screenPosition.y, wb.scale.x * 10, wb.scale.y * 10);
                         }
                     });
                     chunksRendered++;
