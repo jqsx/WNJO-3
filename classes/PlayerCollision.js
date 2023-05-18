@@ -23,14 +23,17 @@ export class PlayerCollision {
         dir = new vec(ooftSign(dir.x / 128), ooftSign(dir.y / 128));
 
         var i = 0;
+        var j= 0;
         for (let x = 0; Math.abs(x) <= Math.abs(dir.x); x += ooftSign(dir.x)) {
             for (let y = 0; Math.abs(y) <= Math.abs(dir.y); y += ooftSign(dir.y)) {
                 let _chank = this.app.ChunkData.get(chunkPos.x - x, chunkPos.y - y);
                 if (_chank instanceof Chunk) {
                     _chank.worldBlocks.forEach(wb => {
                         if (!wb.isSolid) return;
-                        if (localPlayer.position.distance(wb.position) < 11 + Math.max(wb.scale.x, wb.scale.y)) {
-                            if (this.rectIntersect(wb, _chank)) return true;
+                        if (localPlayer.position.distance(chunkPos.multiply(256).add(wb.position)) < 11 + Math.max(wb.scale.x, wb.scale.y)) {
+                            if (this.rectIntersect(wb, _chank)) {
+                                j++;
+                            }
                             i++;
                         }
                     })
@@ -38,6 +41,7 @@ export class PlayerCollision {
             }
         }
         document.getElementById('debug').innerText += "\nwb count: " + i;
+        document.getElementById('debug').innerText += "\nwb collided count: " + j;
         return false;
     }
 
@@ -45,10 +49,15 @@ export class PlayerCollision {
         if (!worldBlock.isSolid) return;
         let localPlayer = this.app.localPlayer;
 
-        let wbpos = new vec(worldBlock.position.x + chunk.chunkPosition.x * 256, worldBlock.position.y + chunk.chunkPosition.y * 256)
+        let relativeToChunk = localPlayer.position.sub(chunk.chunkPosition.multiply(256));
+        document.getElementById('debug').innerText += `\nrel: ${relativeToChunk.toString()}`;
+        // if (relativeToChunk.x < -35 || relativeToChunk.x > 256 + 35 + worldBlock.scale.x || relativeToChunk.y < -55 || relativeToChunk.y > 256 + 55 + worldBlock.scale.y) return false;
+        
+        let a = relativeToChunk;
+        let b = worldBlock.position;
 
-        let x = localPlayer.position.x + 70 > wbpos.x && localPlayer.position.x - 35 < wbpos.x + worldBlock.scale.x * 10;
-        let y = localPlayer.position.y + 110 > wbpos.y && localPlayer.position.y - 55 < wbpos.y + worldBlock.scale.y * 10;
+        let x = a.x + 35 < b.x && a.x - 35 > b.x + worldBlock.scale.x;
+        let y = a.y + 55 < b.y && a.y - 55 > b.y + worldBlock.scale.y;
 
         return x && y;
     }
