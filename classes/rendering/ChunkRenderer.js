@@ -68,8 +68,8 @@ export default class ChunkRenderer extends RenderLayer {
                                 this.#ctx.closePath();
                             }
                             this.#ctx.drawImage(tex, screenPosition.x + (8 - tex.width / 2) * 10, screenPosition.y + (16 - tex.height) * 10, (tex.width * 10), (tex.width * 10));
-                            this.#ctx.strokeStyle = '#ff0000';
-                            this.#ctx.strokeRect(screenPosition.x, screenPosition.y, wb.scale.x * 10, wb.scale.y * 10);
+                            // this.#ctx.strokeStyle = '#ff0000';
+                            // this.#ctx.strokeRect(screenPosition.x, screenPosition.y, wb.scale.x * 10, wb.scale.y * 10);
                         }
                     });
                     chunksRendered++;

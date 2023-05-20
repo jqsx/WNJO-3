@@ -10,6 +10,7 @@ import InventoryRender from "./rendering/InventoryRenderer.js";
 import PlayerRenderer from "./rendering/PlayerRenderer.js";
 import ChunkRenderer from "./rendering/ChunkRenderer.js";
 import { PlayerCollision } from "./PlayerCollision.js";
+import { DEBUG } from "./DEBUG.js";
 
 export default class App {
     static instance;
@@ -144,6 +145,7 @@ export default class App {
         this.renderingStack.ChunkRenderer.render();
         this.renderingStack.PlayerRenderer.render();
         this.renderingStack.InventoryRender.render();
+        DEBUG.draw(this.#ctx);
 
         // end of render stack
 
@@ -180,10 +182,7 @@ export default class App {
         this.cameraPosition.x -= x * 45 * this.deltaTime;
         this.cameraPosition.y -= y * 45 * this.deltaTime;
 
-        if (this.playerCollider.collisionCheck()) {
-            this.cameraPosition.x += x * 45 * this.deltaTime;
-        this.cameraPosition.y += y * 45 * this.deltaTime;
-        }
+        this.playerCollider.updateCollisions();
 
         if (this.localPlayer !== undefined) {
             this.localPlayer.position.x = this.cameraPosition.x;
