@@ -17,17 +17,14 @@ export class PlayerCollision {
             let localPlayer = this.app.localPlayer;
             let campos = this.app.cameraPosition;
             let wbpos = col.chunk.chunkPosition.multiply(256).add(col.wb.position).add(new vec(col.wb.scale.x / 2, col.wb.scale.y / 2));
-            let diff = wbpos.sub(localPlayer.position)
+            let diff = wbpos.add(new vec(-col.wb.scale.x / 2, col.wb.scale.y / 2)).sub(localPlayer.position)
 
             if (Math.abs(diff.x) > Math.abs(diff.y)) {
-                localPlayer.position.y += diff.y;
+                this.app.cameraPosition.y -= diff.y;
             }
             else {
-                localPlayer.position.x += diff.x;
+                this.app.cameraPosition.x -= diff.x;
             }
-
-            campos.x = localPlayer.position.x;
-            campos.y = localPlayer.position.y;
         }
     }
 
@@ -42,9 +39,6 @@ export class PlayerCollision {
         dir.x -= localPlayer.position.x;
         dir.y -= localPlayer.position.y;
         dir = new vec(ooftSign(dir.x / 128), ooftSign(dir.y / 128));
-
-        var i = 0;
-        var j= 0;
         for (let x = 0; Math.abs(x) <= Math.abs(dir.x); x += ooftSign(dir.x)) {
             for (let y = 0; Math.abs(y) <= Math.abs(dir.y); y += ooftSign(dir.y)) {
                 let _chank = this.app.ChunkData.get(chunkPos.x - x, chunkPos.y - y);
@@ -52,12 +46,10 @@ export class PlayerCollision {
                     for (let i = 0; i < _chank.worldBlocks.length; i++) {
                         const wb = _chank.worldBlocks[i];
                         if (!wb.isSolid) continue;
-                        if (localPlayer.position.distance(_chank.chunkPosition.multiply(256).add(new vec(wb.position.x + 16, wb.position.y))) < 16  + Math.max(wb.scale.x, wb.scale.y)) {
+                        if (localPlayer.position.distance(_chank.chunkPosition.multiply(256).add(new vec(wb.position.x + 8, wb.position.y + 8))) < 16 + Math.max(wb.scale.x, wb.scale.y)) {
                             if (this.rectIntersect(wb, _chank)) {
-                                j++;
                                 return { wb: wb, chunk: _chank };
                             }
-                            i++;
                         }
                     }
                 }
@@ -71,7 +63,7 @@ export class PlayerCollision {
         let localPlayer = this.app.localPlayer;
 
         let chunkWorldPos = chunk.chunkPosition.multiply(256);
-        let actual = new vec(worldBlock.position.x + 16 ,worldBlock.position.y).add(chunkWorldPos);
+        let actual = new vec(worldBlock.position.x ,worldBlock.position.y).add(chunkWorldPos);
         // DEBUG.debugPoint(actual);
         // DEBUG.debugPoint(test);
         // DEBUG.debugPoint(localPlayer.position);
@@ -79,18 +71,21 @@ export class PlayerCollision {
         // let relativeToChunk = localPlayer.position.sub(chunk.chunkPosition.multiply(256));
         // if (relativeToChunk.x < -35 || relativeToChunk.x > 256 + 35 + worldBlock.scale.x || relativeToChunk.y < -55 || relativeToChunk.y > 256 + 55 + worldBlock.scale.y) return false;
         
-        let a = localPlayer.position.multiply(-1);
-        let b = actual.multiply(-1);
+        let a = localPlayer.position;
+        let b = actual.add(new vec(0, 0));
 
-        // DEBUG.debugLine(a, b);
+        // DEBUG.debugLine(localPlayer.position, actual);
 
-        let x = a.x + 3.5 > b.x + worldBlock.scale.x && a.x - 3.5 < b.x + worldBlock.scale.x;
+        let x = a.x + 3.5 > b.x && a.x - 3.5 - worldBlock.scale.x < b.x;
         // a.x - 3.5 < b.x && a.x + 3.5 > b.x - worldBlock.scale.x;
-        let y = a.y + 5.5 > b.y + worldBlock.scale.y && a.y - 5.5 < b.y + worldBlock.scale.y;
+        let y = a.y + 5.5 > b.y && a.y - 5.5 - worldBlock.scale.y < b.y;
         //a.y - 5.5 < b.y && a.y + 5.5 > b.y - worldBlock.scale.y;
 
         // DEBUG.debugLine(new vec(a.x, b.y), b);
 
+        // if (y) {
+        //     DEBUG.debugLine(localPlayer.position, actual.add(new vec(16, 0)));
+        // }
         return x && y;
     }
 }

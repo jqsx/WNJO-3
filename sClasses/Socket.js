@@ -86,7 +86,7 @@ export default class ServerSocket extends WebSocketServer {
                                 arr.push(new WorldBlock({position: new vec(_x * 16, _y * 16), texture: "block", scale: new vec(16, 16)}));
                             }
                             else if (noise(tP.x, tP.y) > 0.4 && noise(tP.x * 8, tP.y * 8) > 0.4 && (_x + _y) % 2 == 0) {
-                                arr.push(new WorldBlock({position: new vec(_x * 16, _y * 16), texture: Math.random() < 0.5 ? "tree" : "smalltree", isSolid: false}));
+                                arr.push(new WorldBlock({position: new vec(_x * 16, _y * 16), texture: Math.random() < 0.5 ? "tree" : (Math.random() < 0.5 ? "smalltree" : "shortgrass"), isSolid: false}));
                             }
                         }
                         else {

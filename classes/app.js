@@ -39,7 +39,7 @@ export default class App {
         App.instance = this;
         this.renderer.width = 1920;
         this.renderer.height = 1080;
-        this.#ctx.imageSmoothingEnabled = false;
+        this.#ctx.imageSmoothingEnabled = false;    
         Textures.initializeImages();
     }
 

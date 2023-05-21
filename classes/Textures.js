@@ -45,11 +45,24 @@ const imageData = [
         src: "tree.png"
     },
     {
-        name: "smalltree",
+        name: "shortgrass",
         src: "shortgrass.png"
+    },
+    {
+        name: "smalltree",
+        src: "smalltree.png"
     },
     {
         name: "mushroom",
         src: "mashroom.png"
+    }
+]
+
+const tileTextureData = [
+    {
+        name: "Player",
+        src: "bing",
+        h: 16,
+        w: 16
     }
 ]
