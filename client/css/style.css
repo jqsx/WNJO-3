@@ -203,8 +203,7 @@ chat {
 }
 
 chat-box {
-    display: flex;
-    flex-flow: column;
+    display: grid;
     overflow-y: auto;
     gap: 1px;
     margin-bottom: 0.1em;
@@ -220,11 +219,13 @@ chat:focus {
 
 chat-message {
     width: 100%;
+    max-width: inherit;
     min-height: 2vh;
-    height: fit-content;
+    height: max-content;
     font-size: 2vh;
     background-color: #99999988;
     user-select: all;
+    display: flex;
 }
 
 chat-input {

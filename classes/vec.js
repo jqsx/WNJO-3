@@ -39,4 +39,10 @@ export default class vec {
         let diff = this.sub(other);
         return diff.mag();
     }
+
+    lerp(other, t) {
+        const lerp = (a,b,t) => { return a + (b - a) * Math.max(Math.min(t, 1), 0); };
+        this.x = lerp(this.x, other.x, t);
+        this.y = lerp(this.y, other.y, t);
+    }
 }

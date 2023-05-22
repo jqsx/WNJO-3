@@ -11,38 +11,38 @@ export class PlayerCollision {
         }
     }
 
-    updateCollisions() {
+    updateCollisions(lastMove) {
         let col = this.collisionCheck();
         if (col !== null) {
             let localPlayer = this.app.localPlayer;
-            let campos = this.app.cameraPosition;
-            let wbpos = col.chunk.chunkPosition.multiply(256).add(col.wb.position).add(new vec(col.wb.scale.x / 2, col.wb.scale.y / 2));
-            // let diff = wbpos.add(new vec(-col.wb.scale.x / 2, col.wb.scale.y / 2)).sub(localPlayer.position);
-            let wbCentered = wbpos.add(new vec(-col.wb.scale.x / 2, col.wb.scale.y / 2));
+            localPlayer.position.x += lastMove.x;
+            localPlayer.position.y += lastMove.y;
+            // let campos = this.app.cameraPosition;
+            // let wbpos = col.chunk.chunkPosition.multiply(256).add(col.wb.position).add(new vec(col.wb.scale.x / 2, col.wb.scale.y / 2));
+            // // let diff = wbpos.add(new vec(-col.wb.scale.x / 2, col.wb.scale.y / 2)).sub(localPlayer.position);
+            // let wbCentered = wbpos.add(new vec(-col.wb.scale.x / 2, col.wb.scale.y / 2));
 
-            let diff = wbCentered.sub(localPlayer.position);
-            let gap = diff.sub(new vec(-col.wb.scale.x / 2, col.wb.scale.y / 2));
+            // let diff = wbCentered.sub(localPlayer.position);
+            // let gap = diff.sub(new vec(-col.wb.scale.x / 2, col.wb.scale.y / 2));
 
-            const determineDisplacement = (gap, playerDimension, targetDimension) => {
-                let min = gap;
+            // const determineDisplacement = (gap, playerDimension, targetDimension) => {
+            //     let min = gap;
 
-                const other = gap + playerDimension + targetDimension;
-                if (other < Math.abs(min)) min = other;
+            //     const other = gap + playerDimension + targetDimension;
+            //     if (other < Math.abs(min)) min = other;
 
-                return min;
-            };
+            //     return min;
+            // };
 
-            let displacement = new vec(determineDisplacement(gap.x, 7, col.wb.scale.x), determineDisplacement(gap.y, 11, col.wb.scale.y));
-            DEBUG.log("bing: " + displacement);
-            if (Math.abs(displacement.y) > Math.abs(displacement.x)) {
-                localPlayer.position.y -= displacement.y / 2;
-                campos.y = localPlayer.position.y;
-                DEBUG.log("disp y");
-            } else {
-                DEBUG.log("disp x");
-                localPlayer.position.x -= displacement.x / 2;
-                campos.x = localPlayer.position.x;
-            }
+            // let displacement = new vec(determineDisplacement(gap.x, 7, col.wb.scale.x), determineDisplacement(gap.y, 11, col.wb.scale.y));
+            // DEBUG.log("bing: " + displacement);
+            // if (Math.abs(displacement.y) > Math.abs(displacement.x)) {
+            //     localPlayer.position.y -= displacement.y / (col.wb.scale.y / 2);
+            //     DEBUG.log("disp y");
+            // } else {
+            //     DEBUG.log("disp x");
+            //     localPlayer.position.x -= displacement.x / (col.wb.scale.x / 2);
+            // }
         }
     }
 

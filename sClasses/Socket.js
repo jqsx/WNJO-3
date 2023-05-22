@@ -12,8 +12,9 @@ import vec from "../classes/vec.js";
 // import SimplexNoise from 'simplex-noise';
 import WorldBlock from "../classes/WorldDataClasses/WorldBlock.js";
 import { createNoise2D } from "simplex-noise";
+import ChatHandler from "./ChatHandler.js";
 const bingnoise = createNoise2D(() => {
-    return 12345;
+    return 0.1230;
 });
 
 const noise = (x, y) => {
@@ -29,10 +30,12 @@ export default class ServerSocket extends WebSocketServer {
 
     playerHandler;
     accountHandler;
+    chatHandler;
     constructor() {
         super({ port: config.WSPORT });
         this.playerHandler = new PlayerHandler(this);
         this.accountHandler = new AccountHandler(this);
+        this.chatHandler = new ChatHandler(this);
         this.generateSomeChunksIg();
         this.registerExitProtocol();
         this.on('connection', (ws, req) => {
@@ -46,6 +49,9 @@ export default class ServerSocket extends WebSocketServer {
                     }
                     else if (json.TYPE === 'ARP') {
                         this.accountHandler.processRequest(json.data, ws);
+                    }
+                    else if (json.TYPE === 'CHAT') {
+                        this.chatHandler.processRequest(json.data, ws);
                     }
                 }
                 catch (e) {

@@ -11,6 +11,7 @@ import PlayerRenderer from "./rendering/PlayerRenderer.js";
 import ChunkRenderer from "./rendering/ChunkRenderer.js";
 import { PlayerCollision } from "./PlayerCollision.js";
 import { DEBUG } from "./DEBUG.js";
+import ChatHandler from "./Handlers/ChatHandler.js";
 
 export default class App {
     static instance;
@@ -109,6 +110,7 @@ export default class App {
         this.#clientSocket.setHandler(PlayerHandler.getType(), new PlayerHandler());
         this.#clientSocket.setHandler(LoginHandler.getType(), new LoginHandler());
         this.#clientSocket.setHandler(ErrorLogHandler.getType(), new ErrorLogHandler());
+        this.#clientSocket.setHandler(ChatHandler.getType(), new ChatHandler(this.#clientSocket));
 
         console.log("Bing bong")
     }
@@ -179,19 +181,18 @@ export default class App {
     playerInput() {
         let x = this.#toInt(this.isKeyDown("d")) + this.#toInt(this.isKeyDown("a")) * -1;
         let y = this.#toInt(this.isKeyDown("w")) + this.#toInt(this.isKeyDown("s")) * -1;
-        this.cameraPosition.x -= x * 45 * this.deltaTime;
-        this.cameraPosition.y -= y * 45 * this.deltaTime;
-
-        this.playerCollider.updateCollisions();
 
         if (this.localPlayer !== undefined) {
-            this.localPlayer.position.x = this.cameraPosition.x;
-            this.localPlayer.position.y = this.cameraPosition.y;
+            let move = new vec(x, y).multiply(45 * this.deltaTime);
+            this.localPlayer.position.x -= move.x;
+            this.localPlayer.position.y -= move.y;
+            this.playerCollider.updateCollisions(move);
+            this.cameraPosition.lerp(this.localPlayer.position, this.deltaTime * 10);
             document.getElementById('debug').innerText += "\nLocal Player Position: " + this.localPlayer.position;
         }
         document.getElementById('debug').innerText += "\nCamera Position: " + this.cameraPosition.toString();
 
-        if (x !== 0 || y !== 0) this.#clientSocket.sendMessage("PUP", {position: this.cameraPosition});
+        if (x !== 0 || y !== 0) this.#clientSocket.sendMessage("PUP", {position: this.localPlayer.position});
     }
 
     #toInt(bool) {
