@@ -7,6 +7,7 @@ import Chunk from "../WorldDataClasses/Chunk.js";
 export default class ChunkRenderer extends RenderLayer {
     #app;
     #ctx;
+    #currentRenderNonSolids = [];
     constructor(app, ctx) {
         super();
         if (app instanceof App) {

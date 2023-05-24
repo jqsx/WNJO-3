@@ -74,9 +74,7 @@ export default class ServerSocket extends WebSocketServer {
             this.clients.forEach(client => {
                 client.send(JSON.stringify([{ TYPE: "PUP", data: this.#getPlayers() }]))
             });
-        }, 1000 / 10);
-
-        
+        }, 1000 / 10);        
     }
 
     generateSomeChunksIg() {
