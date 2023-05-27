@@ -132,7 +132,7 @@ button {
     background-color: #707070aa;
     outline: none;
     border: none;
-    cursor: grab;
+    cursor:pointer;
     transition-duration: 0.25s;
 }
 
@@ -238,4 +238,16 @@ chat-input input {
     width: 99%;
     height: 100%;
     font-size: 100%;
+}
+
+flexcontainer.uipanel {
+    justify-content: left;
+    background: none;
+}
+
+flexcontainer.uipanel img {
+    image-rendering: pixelated;
+    height: 2em;
+    width: 2em;
+    margin-left: 0.5em;
 }

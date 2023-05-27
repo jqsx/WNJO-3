@@ -42,6 +42,27 @@ export default class App {
         this.renderer.height = 1080;
         this.#ctx.imageSmoothingEnabled = false;    
         Textures.initializeImages();
+
+        let ui = document.getElementById('ui');
+        for (let i = 0; i < 5; i++) {
+            if (i < 2) {
+                ui.appendChild(Textures.getTexture('ui-fullHeart').cloneNode());
+            } else if (i == 2) {
+                ui.appendChild(Textures.getTexture('ui-halfHeart').cloneNode());
+            }
+            else {
+                ui.appendChild(Textures.getTexture('ui-noHeart').cloneNode());
+            }
+        }
+        let uiamr = document.getElementById('ui-armr');
+        for (let i = 0; i < 5; i++) {
+            if (i < 2) {
+                uiamr.appendChild(Textures.getTexture('ui-fullArmor').cloneNode());
+            } else if (i == 2) {
+                uiamr.appendChild(Textures.getTexture('ui-halfArmor').cloneNode());
+            }
+        }
+        // temporary ui generation 
     }
 
     #time = performance.now();
