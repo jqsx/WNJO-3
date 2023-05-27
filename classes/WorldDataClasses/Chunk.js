@@ -5,9 +5,12 @@ export default class Chunk {
     chunkPosition = new vec(0, 0);
     biome= "forest";
     worldBlocks = [];
+    worldBlocksByHeight = [];
     
     constructor(position, data) {
         if (position !== undefined && position instanceof vec) this.chunkPosition = position;
-        if (data !== undefined) this.worldBlocks = data;
+        if (data !== undefined) {
+            this.worldBlocks = data; 
+        }
     }
 }
