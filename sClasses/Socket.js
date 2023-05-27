@@ -19,7 +19,9 @@ const bingnoise = createNoise2D(() => {
 
 const noise = (x, y) => {
     let z = bingnoise(x, y);
-    return (z + 1) / 2.0;
+    let d = bingnoise(x * 10.0, y * 10.0);
+    d = (d + 1) / 2.0;
+    return Math.min(Math.max((z + 1) / 2.0 + d * 0.2, 0), 1);
 }
 
 export default class ServerSocket extends WebSocketServer {
