@@ -53,6 +53,26 @@ const imageData = [
         src: "smalltree.png"
     },
     {
+        name: "ui-fullHeart",
+        src: "ui/icons/fullHeart.png"
+    },
+    {
+        name: "ui-fullArmor",
+        src: "ui/icons/fullArmor.png"
+    },
+    {
+        name: "ui-halfHeart",
+        src: "ui/icons/halfHeart.png"
+    },
+    {
+        name: "ui-noHeart",
+        src: "ui/icons/noHeart.png"
+    },
+    {
+        name: "ui-halfArmor",
+        src: "ui/icons/halfArmor.png"
+    },
+    {
         name: "mushroom",
         src: "mashroom.png"
     }

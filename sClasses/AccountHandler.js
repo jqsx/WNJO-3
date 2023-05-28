@@ -4,7 +4,6 @@ import ServerSocket from "./Socket.js";
 import WebSocket from "ws";
 import fs from 'fs';
 import path from "path";
-import config from "../config.js";
 
 export default class AccountHandler {
     #ServerSocket;
@@ -16,7 +15,6 @@ export default class AccountHandler {
             fs.readFile(path.resolve('./AccountData/accounts.json'), (err, data) => {
                 if (err) 
                     throw err;
-                
                 try {
                     const json = JSON.parse(data);
                     for (var x in json) {
@@ -60,7 +58,7 @@ export default class AccountHandler {
                 this.#ServerSocket.sendErr(ws, "Invalid parameters");
                 return;
             } 
-            else if ((message.n.length <= 3 || message.p.length <= 6 && message.n.length > 16 && message.p.length > 32)) {
+            else if ((message.n.length <= 3 || message.p.length <= 6 || message.n.length > 16 || message.p.length > 32)) {
                 this.#ServerSocket.sendErr(ws, "Either the name, or the password exceeds the length bounds.\n\n The name can only be between 4 to 16 letters long and the password 7 to 32.");
                 return;
             }
