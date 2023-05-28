@@ -48,6 +48,12 @@ export default class ChatHandler extends Handler {
             if ("color" in element) {
                 c.style.color = element.color;
             }
+            if ("background" in element) {
+                c.style.backgroundColor = element.background;
+            }
+            if ("bold" in element) {
+                c.style.fontWeight = 'bold';
+            }
             c.innerText = element.text;
             parent.appendChild(c);
         });

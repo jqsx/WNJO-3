@@ -8,6 +8,7 @@ export default class PlayerRenderer extends RenderLayer {
     #app;
     #ctx;
     #localPlayers = new Map();
+    renderedPlayers = [];
     constructor(app, ctx) {
         super();
         if (app instanceof App) {
@@ -19,6 +20,7 @@ export default class PlayerRenderer extends RenderLayer {
     }
 
     render() {
+        this.renderedPlayers = [];
         let localPlayer = this.#app.localPlayer;
         this.#app.Players.forEach((player) => {
             if (localPlayer !== undefined && localPlayer.id === player.id) 
@@ -56,5 +58,6 @@ export default class PlayerRenderer extends RenderLayer {
 
         this.#ctx.strokeStyle = '#ff0000';
         this.#ctx.strokeRect(screenPosition.x - 35, screenPosition.y - 55, 70, 110);
+        this.renderedPlayers.push(player);
     }
 }

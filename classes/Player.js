@@ -4,6 +4,7 @@ export default class Player {
     id=0;
     name="";
     position = new vec(0,0);
+    action = "idle";
     constructor(playerData) {
         this.id = "id" in playerData ? playerData["id"] : Math.random();
         this.position = "position" in playerData && playerData["position"] instanceof vec ? new vec(playerData["position"].x, playerData["position"].y) : this.position;

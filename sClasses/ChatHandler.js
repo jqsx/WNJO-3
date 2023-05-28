@@ -18,10 +18,16 @@ export default class ChatHandler {
         if (message === undefined) return;
         if (!(ws instanceof WebSocket)) return;
         let acc = this.#ServerSocket.Players.get(this.#ServerSocket.Clients.get(ws).account);
+        let actualAcc = this.#ServerSocket.accountHandler.LoadedAccounts.get(acc.name);
+        let userData = [];
+        if (actualAcc.rank === 'admin') {
+            userData.push({ color: "white", bold: true, background: "gold", text: "ADMIN"});
+        }
+        userData.push({ text: acc.name });
+        
+
         let finMsg = {
-            userData: [
-                { color: "green", text: acc.name }
-            ],
+            userData: userData,
             message: [
                 { text: message.msg }
             ]

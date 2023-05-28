@@ -251,3 +251,11 @@ flexcontainer.uipanel img {
     width: 2em;
     margin-left: 0.5em;
 }
+
+chat-message span {
+    margin-right: 0.3em;
+}
+
+canvas {
+    cursor: none;
+}

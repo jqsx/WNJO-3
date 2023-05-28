@@ -167,6 +167,7 @@ export default class App {
 
         this.renderingStack.ChunkRenderer.render();
         this.renderingStack.PlayerRenderer.render();
+        this.renderingStack.ChunkRenderer.nonSolidPlayerPass();
         this.renderingStack.InventoryRender.render();
         DEBUG.draw(this.#ctx);
 

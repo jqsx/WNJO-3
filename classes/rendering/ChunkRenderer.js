@@ -3,6 +3,7 @@ import RenderLayer from "./RenderLayer.js";
 import Textures from "../Textures.js";
 import vec from "../vec.js";
 import Chunk from "../WorldDataClasses/Chunk.js";
+import { DEBUG } from "../DEBUG.js";
 
 export default class ChunkRenderer extends RenderLayer {
     #app;
@@ -19,6 +20,7 @@ export default class ChunkRenderer extends RenderLayer {
     }
 
     render() {
+        this.#currentRenderNonSolids = [];
         const localPlayer = this.#app.localPlayer;
         let localPosition = new vec(Number(localPlayer.position.x), Number(localPlayer.position.y));
         // let block = Textures.getTexture("block");
@@ -59,7 +61,9 @@ export default class ChunkRenderer extends RenderLayer {
                 if (_chank instanceof Chunk) {
                     _chank.worldBlocks.forEach(wb => {
                         const tex = Textures.getTexture(wb.texture);
-                        let screenPosition = this.worldToScreen(new vec(wb.position.x + 16, wb.position.y).add(_chank.chunkPosition.multiply(256)));
+                        let worldpos = _chank.chunkPosition.multiply(256).add(new vec(wb.position.x, wb.position.y)).add(new vec(16, 0));
+                        let screenPosition = this.worldToScreen(worldpos);
+                        let dist = localPlayer.position.distance(worldpos);
                         if (screenPosition.x > -tex.width * 20 && screenPosition.x < this.#app.renderer.width && screenPosition.y > -tex.height * 20 && screenPosition.y < this.#app.renderer.height + (tex.height - 16) * 10) {
                             if (!wb.isSolid) {
                                 this.#ctx.fillStyle = '#33333366';
@@ -67,6 +71,11 @@ export default class ChunkRenderer extends RenderLayer {
                                 this.#ctx.ellipse(screenPosition.x + 16 * 5, screenPosition.y + 16 * 9, 16 * 3, 16 * 1, 0, 0, Math.PI * 2);
                                 this.#ctx.fill();
                                 this.#ctx.closePath();
+                                this.#currentRenderNonSolids.push({chunk: _chank, wb: wb });
+                                if (dist < Math.max(tex.width, tex.height))
+                                    if (worldpos.y > localPlayer.position.y - 11) {
+                                        return;
+                                    }
                             }
                             this.#ctx.drawImage(tex, screenPosition.x + (8 - tex.width / 2) * 10, screenPosition.y + (16 - tex.height) * 10, (tex.width * 10), (tex.width * 10));
                             // this.#ctx.strokeStyle = '#ff0000';
@@ -87,5 +96,24 @@ export default class ChunkRenderer extends RenderLayer {
 
         document.getElementById('debug').innerText += `\nChunk ${chunkPos}`;
         document.getElementById('debug').innerText += `\nChunks rendered ${chunksRendered}`;
+    }
+
+    nonSolidPlayerPass() {
+        var count = 0;
+        this.#app.renderingStack.PlayerRenderer.renderedPlayers.forEach(player => {
+            this.#currentRenderNonSolids.forEach(val => {
+                let worldpos = val.chunk.chunkPosition.multiply(256).add(new vec(val.wb.position.x, val.wb.position.y)).add(new vec(16, 0));
+                let screenPosition = this.worldToScreen(worldpos);
+                let dist = player.position.distance(worldpos);
+                const tex = Textures.getTexture(val.wb.texture);
+                if (dist > Math.max(tex.width, tex.height)) return;
+                if (worldpos.y > player.position.y - 11) {
+                    this.#ctx.drawImage(tex, screenPosition.x + (8 - tex.width / 2) * 10, screenPosition.y + (16 - tex.height) * 10, (tex.width * 10), (tex.width * 10));
+                    count++;
+                }
+            });
+        })
+        DEBUG.log("NonSolids = " + this.#currentRenderNonSolids.length);
+        DEBUG.log("Rerendered = " + count);
     }
 }
