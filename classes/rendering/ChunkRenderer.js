@@ -4,6 +4,7 @@ import Textures from "../Textures.js";
 import vec from "../vec.js";
 import Chunk from "../WorldDataClasses/Chunk.js";
 import { DEBUG } from "../DEBUG.js";
+import Particle from "../WorldDataClasses/Particle.js";
 
 export default class ChunkRenderer extends RenderLayer {
     #app;
@@ -72,6 +73,9 @@ export default class ChunkRenderer extends RenderLayer {
                                 this.#ctx.fill();
                                 this.#ctx.closePath();
                                 this.#currentRenderNonSolids.push({chunk: _chank, wb: wb });
+                                if (Math.random() < 0.002) {
+                                    new Particle({ position: worldpos, rotation: Math.PI * 2 * Math.random(), velocity: new vec(50 * Math.random(), 10 * (1 - Math.random())), lifetime: 4000, texture: "leaf"});
+                                }
                                 if (dist < Math.max(tex.width, tex.height))
                                     if (worldpos.y > localPlayer.position.y - 11) {
                                         return;

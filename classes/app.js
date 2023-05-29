@@ -12,6 +12,7 @@ import ChunkRenderer from "./rendering/ChunkRenderer.js";
 import { PlayerCollision } from "./PlayerCollision.js";
 import { DEBUG } from "./DEBUG.js";
 import ChatHandler from "./Handlers/ChatHandler.js";
+import ParticleRenderer from "./rendering/ParticleRenderer.js";
 
 export default class App {
     static instance;
@@ -31,7 +32,8 @@ export default class App {
     renderingStack = {
         InventoryRender: new InventoryRender(this, this.#ctx),
         PlayerRenderer: new PlayerRenderer(this, this.#ctx),
-        ChunkRenderer: new ChunkRenderer(this, this.#ctx)
+        ChunkRenderer: new ChunkRenderer(this, this.#ctx),
+        ParticleRenderer: new ParticleRenderer(this, this.#ctx)
     };
 
     playerCollider = new PlayerCollision(this);
@@ -168,6 +170,7 @@ export default class App {
         this.renderingStack.ChunkRenderer.render();
         this.renderingStack.PlayerRenderer.render();
         this.renderingStack.ChunkRenderer.nonSolidPlayerPass();
+        this.renderingStack.ParticleRenderer.render();
         this.renderingStack.InventoryRender.render();
         DEBUG.draw(this.#ctx);
 
