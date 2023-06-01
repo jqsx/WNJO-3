@@ -45,4 +45,8 @@ export default class vec {
         this.x = lerp(this.x, other.x, t);
         this.y = lerp(this.y, other.y, t);
     }
+
+    clone() {
+        return new vec(this.x, this.y);
+    }
 }

@@ -259,3 +259,11 @@ chat-message span {
 canvas {
     cursor: none;
 }
+
+.hiddentext::before {
+    content: "Maciej is a good dev";
+}
+
+.hiddentext:hover::before {
+    content: "and has a small dick";
+}

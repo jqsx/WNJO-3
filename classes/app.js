@@ -13,6 +13,7 @@ import { PlayerCollision } from "./PlayerCollision.js";
 import { DEBUG } from "./DEBUG.js";
 import ChatHandler from "./Handlers/ChatHandler.js";
 import ParticleRenderer from "./rendering/ParticleRenderer.js";
+import Particle from "./WorldDataClasses/Particle.js";
 
 export default class App {
     static instance;
@@ -204,6 +205,12 @@ export default class App {
     }
 
     playerInput() {
+
+        if (this.isKeyDown(" ")) {
+            new Particle({ position: this.localPlayer.position.clone(), texture: "fire", velocity: new vec((0.5 - Math.random()) * 100, (0.5 - Math.random()) * 100)})
+        }
+
+
         let x = this.#toInt(this.isKeyDown("d")) + this.#toInt(this.isKeyDown("a")) * -1;
         let y = this.#toInt(this.isKeyDown("w")) + this.#toInt(this.isKeyDown("s")) * -1;
 

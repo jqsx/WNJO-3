@@ -98,7 +98,7 @@ export default class ServerSocket extends WebSocketServer {
                         else {
                             if (biome > 0.73) {
                                 let tP = new vec((x * 256 + _x * 16) / 256, (y * 256 + _y * 16) / 256);
-                                if (noise(tP.x, tP.y) > 0.4 && noise(tP.x * 8, tP.y * 8) > 0.4 && (_x + _y) % 10 == 0) {
+                                if (noise(tP.x, tP.y) > 0.4 && noise(tP.x * 8, tP.y * 8) > 0.4 && (_x + _y) % 2 == 0) {
                                     arr.push(new WorldBlock({position: new vec(_x * 16, _y * 16), texture: "mushroom", isSolid: false}));
                                 }
                             } 

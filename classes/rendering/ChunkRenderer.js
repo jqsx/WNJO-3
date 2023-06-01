@@ -73,8 +73,8 @@ export default class ChunkRenderer extends RenderLayer {
                                 this.#ctx.fill();
                                 this.#ctx.closePath();
                                 this.#currentRenderNonSolids.push({chunk: _chank, wb: wb });
-                                if (Math.random() < 0.002) {
-                                    new Particle({ position: worldpos, rotation: Math.PI * 2 * Math.random(), velocity: new vec(50 * Math.random(), 10 * (1 - Math.random())), lifetime: 4000, texture: "leaf"});
+                                if (Math.random() < 0.001) {
+                                    new Particle({ position: worldpos, rotation: Math.PI * 2 * Math.random(), randomForces: new vec(10, 0), velocity: new vec(5 * -Math.random(), 10 * (1 - Math.random()) + 10), lifetime: 4000, texture: "leaf"});
                                 }
                                 if (dist < Math.max(tex.width, tex.height))
                                     if (worldpos.y > localPlayer.position.y - 11) {
