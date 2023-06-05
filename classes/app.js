@@ -14,11 +14,13 @@ import { DEBUG } from "./DEBUG.js";
 import ChatHandler from "./Handlers/ChatHandler.js";
 import ParticleRenderer from "./rendering/ParticleRenderer.js";
 import Particle from "./WorldDataClasses/Particle.js";
+import FireParticle from "./WorldDataClasses/Particles/FireParticle.js";
 
 export default class App {
     static instance;
     static mousePosition = new vec(0, 0);
     cameraPosition = new vec(0, 0);
+    PlayerInputDirection = new vec(0, 0);
     renderer = document.createElement("canvas");
     #ctx = this.renderer.getContext("2d");
     #clientSocket = ClientSocket;
@@ -43,7 +45,7 @@ export default class App {
         App.instance = this;
         this.renderer.width = 1920;
         this.renderer.height = 1080;
-        this.#ctx.imageSmoothingEnabled = false;    
+        this.#ctx.imageSmoothingEnabled = false;
         Textures.initializeImages();
 
         let ui = document.getElementById('ui');
@@ -207,12 +209,18 @@ export default class App {
     playerInput() {
 
         if (this.isKeyDown(" ")) {
-            new Particle({ position: this.localPlayer.position.clone(), texture: "fire", velocity: new vec((0.5 - Math.random()) * 100, (0.5 - Math.random()) * 100)})
+            // new Particle({ position: this.localPlayer.position.clone(), texture: "fire", velocity: new vec((0.5 - Math.random()) * 100, (0.5 - Math.random()) * 100)})
+            // const pos = new vec(App.mousePosition.x * (this.renderer.width / window.innerWidth), App.mousePosition.y * (this.renderer.height / window.innerHeight));
+            // let dir = this.screenToWorld(App.mousePosition).sub(this.localPlayer.position).normalized().multiply(300);
+            // new Particle({ position: this.localPlayer.position.clone(), texture: "leaf", velocity: dir});
+            new FireParticle({ position: this.localPlayer.position.clone(), texture: "fire" });
         }
 
 
         let x = this.#toInt(this.isKeyDown("d")) + this.#toInt(this.isKeyDown("a")) * -1;
         let y = this.#toInt(this.isKeyDown("w")) + this.#toInt(this.isKeyDown("s")) * -1;
+
+        DEBUG.debugLine(this.localPlayer.position, this.screenToWorld(App.mousePosition));
 
         if (this.localPlayer !== undefined) {
             let move = new vec(x, y).multiply(45 * this.deltaTime);
@@ -245,5 +253,10 @@ export default class App {
                 this.log("Something went wrong when logging in...", 400);
                 break;
         }
+    }
+
+    screenToWorld(position = vec) {
+        const pos = new vec(position.x * (this.renderer.width / window.innerWidth), position.y * (this.renderer.height / window.innerHeight));
+        return new vec((pos.x - this.renderer.width / 2) / -10 + this.cameraPosition.x, (pos.y - this.renderer.height / 2) / 10 + this.cameraPosition.y);
     }
 }
