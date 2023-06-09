@@ -211,9 +211,9 @@ export default class App {
         if (this.isKeyDown(" ")) {
             // new Particle({ position: this.localPlayer.position.clone(), texture: "fire", velocity: new vec((0.5 - Math.random()) * 100, (0.5 - Math.random()) * 100)})
             // const pos = new vec(App.mousePosition.x * (this.renderer.width / window.innerWidth), App.mousePosition.y * (this.renderer.height / window.innerHeight));
-            // let dir = this.screenToWorld(App.mousePosition).sub(this.localPlayer.position).normalized().multiply(300);
-            // new Particle({ position: this.localPlayer.position.clone(), texture: "leaf", velocity: dir});
-            new FireParticle({ position: this.localPlayer.position.clone(), texture: "fire" });
+            let dir = this.screenToWorld(App.mousePosition).sub(this.localPlayer.position).normalized().multiply(300);
+            new Particle({ position: this.localPlayer.position.clone(), texture: "leaf", velocity: dir});
+            // new FireParticle({ position: this.localPlayer.position.clone(), texture: "fire" });
         }
 
 
