@@ -2,5 +2,7 @@
 *.txt
 .vscode
 AccoundData
+*.json
 node_modules
 GameData
+AccountData/accounts.json
