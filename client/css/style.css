@@ -110,7 +110,7 @@ menu {
 }
 
 menu button {
-    font-size: 2em;
+    font-size: 1.5em;
     margin-top: 0.5em;
 }
 
@@ -160,9 +160,18 @@ h1 {
 }
 
 * {
-    font-family: 'Courier New', Courier, monospace;
+    font-family: 'press_start_2pregular';
     color: #fff;
     user-select: none;
+}
+
+@font-face {
+    font-family: 'press_start_2pregular';
+    src: url('../src/font/pressstart2p-regular-webfont.woff2') format('woff2'),
+         url('../src/font/pressstart2p-regular-webfont.woff') format('woff');
+    font-weight: normal;
+    font-style: normal;
+
 }
 
 html {

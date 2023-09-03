@@ -1,6 +1,7 @@
 import Player from "../classes/Player.js";
 import DataMessage from "./DataMessage.js";
 import ServerSocket from "./Socket.js";
+import { randomUUID } from "crypto";
 import WebSocket from "ws";
 import fs from 'fs';
 import path from "path";
@@ -43,7 +44,7 @@ export default class AccountHandler {
             if (message.a === 'QL') {
                 let acc = this.LoadedAccounts.get(this.QuickLog.get(message.ql).toLowerCase());
                 if (acc !== undefined) {
-                    let ql = crypto.randomUUID();
+                    let ql = randomUUID();
                     this.QuickLog.set(ql, acc.name);
                     this.#initializeNewPlayer(ws, acc, ql);
                     this.#ServerSocket.sendLog(ws, `Signed in with account ${acc.name}`);
@@ -78,7 +79,7 @@ export default class AccountHandler {
                         // Create Account
                         if (acc === undefined) {
                             let nAcc = { // create new account and uuid
-                                _ID: crypto.randomUUID(),
+                                _ID: randomUUID(),
                                 name: message.n,
                                 pass: btoa(message.p),
                                 rank: "player",
@@ -103,7 +104,7 @@ export default class AccountHandler {
                             this.#ServerSocket.sendErr(ws, "The account you're trying to log in with doesn't exist.");
                         }
                         else if (btoa(message.p) === acc.pass) {
-                            let ql = crypto.randomUUID();
+                            let ql = randomUUID();
                             this.QuickLog.set(ql, acc.name);
                             this.#initializeNewPlayer(ws, acc, ql);
                             this.#ServerSocket.sendLog(ws, `Signed in with account ${acc.name}`);

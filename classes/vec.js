@@ -9,7 +9,7 @@ export default class vec {
     }
 
     toString() {
-        return `X:${this.x}Y:${this.y}`;
+        return `X:${Math.round(this.x * 10.0) / 10.0}Y:${Math.round(this.y * 10.0) / 10.0}`;
     }
 
     multiply(value) {

@@ -21,6 +21,10 @@ export default class Server {
 
     this.app.get('/worlddata', (req, res) => {
       res.send(JSON.stringify(this.websocket.ChunkData.getAllValues()));
-    })
+    });
+
+    this.app.get('/font', (req, res) => {
+      res.sendFile(path.resolve('./client/src/font/PressStart2P-Regular.ttf'));
+    });
   }
 };
